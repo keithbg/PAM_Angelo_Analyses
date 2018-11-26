@@ -11,13 +11,10 @@ library(stringr)
 ################################################################################
 
 #### FILE PATHS ################################################################
-#dir_input <- file.path("/Users", "KeithBG", "Dropbox", "Keith_PAM_24Jul2014", "PAM_2014")
-#dir_output <- file.path("/Users", "KeithBG", "Dropbox", "Keith_PAM_24Jul2014", "PAM_2014", "R_formated_data")
-dir_input <- file.path("/Users", "KeithBG", "Dropbox", "PAM_Angelo", "2014", "Data")
-dir_out_fig <- file.path("/Users", "KeithBG", "Dropbox", "PAM_Angelo", "2014", "Figures")
-dir_out_table <- file.path("/Users", "KeithBG", "Dropbox", "PAM_Angelo", "2014", "Data")
+dir_input <- file.path("/Users", "KeithBG", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "PAM_data")
+dir_out_fig <- file.path("/Users", "KeithBG", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "Figures")
+dir_out_table <- file.path("/Users", "KeithBG", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "Data")
 ################################################################################
-
 
 
 
@@ -75,7 +72,7 @@ reg.s <- reg.data %>%
            mutate(Day= as.character(Day))
 
 #### Fv/Fm, Fo ####
-lc.df <- read_tsv(file.path(dir_input, "PAM2014_clean_raw.tsv"))
+lc.df <- read_tsv(file.path(dir_input, "PAM2014_clean_light_curve.tsv"))
 
 FvFM.Fo.df <- lc.df %>%
   filter(Type == "FO", F0_Menupoint == "17") %>%
@@ -128,6 +125,42 @@ reg.rr.s <- reg.rr %>%
                 sd_FvFm.rr = sd(FvFm.rr),
                 se_FvFm.rr = sd_FvFm.rr / sqrt(N)) %>%
               ungroup()
+
+## Benthic/Floating response ratios
+   ## Calculate the response ratio for floating and benthic parameter values for day 1 for each replicate
+
+## Set up new data frame
+reg.data.treatment.d1 <- reg.data %>%
+                          select(-uniqueID, -Treatment, -TreatID) %>%
+                          filter(Day == 1) %>%
+                          mutate(Rep= ifelse(Rep == 2 | Rep == 4 | Rep == 6, Rep - 1, Rep)) %>%
+                          gather(key= param, value= value, Alpha:FvFm) %>%
+                          unite(treat_param, Location, param) %>%
+                          spread(treat_param, value)
+
+## Calculate response ratios
+reg.treat.rr <- reg.data.treatment.d1 %>%
+                  group_by(Rep, Algae) %>%
+                  mutate(Alpha.rr= log(Floating_Alpha / Benthic_Alpha),
+                         ETRm.rr= log(Floating_ETRm / Benthic_ETRm),
+                         FvFm.rr= log(Floating_FvFm / Benthic_FvFm)) %>%
+                  ungroup()
+## Summarize response ratios over replicates
+reg.treat.rr.s <- reg.treat.rr %>%
+                   group_by(Algae) %>%
+                   summarize(
+                     N = length(Alpha.rr),
+                     mean_Alpha.rr = mean(Alpha.rr),
+                     sd_Alpha.rr = sd(Alpha.rr),
+                     se_Alpha.rr = sd_Alpha.rr / sqrt(N),
+                     mean_ETRm.rr = mean(ETRm.rr),
+                     sd_ETRm.rr = sd(ETRm.rr),
+                     se_ETRm.rr = sd_ETRm.rr / sqrt(N),
+                     mean_FvFm.rr = mean(FvFm.rr),
+                     sd_FvFm.rr = sd(FvFm.rr),
+                     se_FvFm.rr = sd_FvFm.rr / sqrt(N)) %>%
+                   ungroup()
+
 
 
 ##### PLOTTING PARAMETERS ######################################################
@@ -201,7 +234,7 @@ theme_pam <- theme(panel.grid = element_blank(),
   ggsave(last_plot(), filename = file.path(dir_out_fig, "ETRmREG2.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
 
 
-  ## ETRm Response ratio
+  ## ETRm response ratio
   ETRm.rr.p <- ggplot(data= reg.rr.s, aes(x= Location,
                                        y= mean_ETRm.rr,
                                        ymax= mean_ETRm.rr + se_ETRm.rr,
@@ -220,6 +253,40 @@ theme_pam <- theme(panel.grid = element_blank(),
     facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
     theme_pam
   ggsave(last_plot(), filename = file.path(dir_out_fig, "ETRmREG2_rr.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
+
+  ## ETRm response ratio day 1
+  ETRm.rr.d1.p <- ggplot(data= reg.treat.rr, aes(x= Algae,
+                                          y= ETRm.rr)) #,
+                                          #ymax= mean_ETRm.rr + se_ETRm.rr,
+                                          #ymin= mean_ETRm.rr - se_ETRm.rr))
+
+  ETRm.rr.d1.p +
+    yintercept +
+    geom_point() +
+   # plot_errorbars +
+    #plot_points
+    #cale_y_continuous(limits= c(-1, 0.55), breaks= seq(-1, 0.76, by= 0.25), labels= c("-1.0", "", "0.5", "", "0.0", "", "0.5", "")) +
+    scale_x_discrete(labels= NULL) +
+    labs(x= "Algae", y= "ETRmax response ratio", title= "Day 1 benthic & floating response ratio") +
+    facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels), scales= "free_x") +
+    theme_pam
+  ggsave(last_plot(), filename = file.path(dir_out_fig, "ETRmREG2_rr_d1_p1.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
+
+  ETRm.rr.d1.p2 <- ggplot(data= reg.treat.rr.s, aes(x= Algae,
+                                                   y= mean_ETRm.rr,
+                                                   ymax= mean_ETRm.rr + se_ETRm.rr,
+                                                   ymin= mean_ETRm.rr - se_ETRm.rr))
+  ETRm.rr.d1.p2 +
+    yintercept +
+    geom_point() +
+    plot_errorbars +
+    #plot_points
+    #scale_y_continuous(limits= c(-1, 0.55), breaks= seq(-1, 0.76, by= 0.25), labels= c("-1.0", "", "0.5", "", "0.0", "", "0.5", "")) +
+    scale_x_discrete(labels= NULL) +
+    labs(x= "Algae", y= "Mean ETRmax response ratio (± se)", title= "Day 1 benthic & floating response ratio") +
+    facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels), scales= "free_x") +
+    theme_pam
+  ggsave(last_plot(), filename = file.path(dir_out_fig, "ETRmREG2_rr_d1_p2.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
 
 
 
@@ -246,7 +313,7 @@ theme_pam <- theme(panel.grid = element_blank(),
     theme_pam
   ggsave(last_plot(), filename = file.path(dir_out_fig, "AlphaREG2.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
 
-  ## ETRm Response ratio
+  ## Alpha Response ratio
   Alpha.rr.p <- ggplot(data= reg.rr.s, aes(x= Location,
                                           y= mean_Alpha.rr,
                                           ymax= mean_Alpha.rr + se_Alpha.rr,
@@ -265,6 +332,25 @@ theme_pam <- theme(panel.grid = element_blank(),
     facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
     theme_pam
   ggsave(last_plot(), filename = file.path(dir_out_fig, "AlphaREG2_rr.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
+
+
+  Alpha.rr.d1.p2 <- ggplot(data= reg.treat.rr.s, aes(x= Algae,
+                                                     y= mean_Alpha.rr,
+                                                     ymax= mean_Alpha.rr + se_Alpha.rr,
+                                                     ymin= mean_Alpha.rr - se_Alpha.rr))
+
+  Alpha.rr.d1.p2 +
+    yintercept +
+    geom_point() +
+    plot_errorbars +
+    #plot_points
+    #scale_y_continuous(limits= c(-1, 0.55), breaks= seq(-1, 0.76, by= 0.25), labels= c("-1.0", "", "0.5", "", "0.0", "", "0.5", "")) +
+    scale_x_discrete(labels= NULL) +
+    labs(x= "Algae", y= "Mean Alpha response ratio (± se)", title= "Day 1 benthic & floating response ratio") +
+    facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels), scales= "free_x") +
+    theme_pam
+  ggsave(last_plot(), filename = file.path(dir_out_fig, "AlphaREG2_rr_d1_p2.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
+
 
 
   ## Fv/Fm
@@ -288,7 +374,7 @@ theme_pam <- theme(panel.grid = element_blank(),
     theme_pam
   ggsave(last_plot(), filename = file.path(dir_out_fig, "FvFm.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
 
-  ## ETRm Response ratio
+  ## FvFm Response ratio
   FvFm.rr.p <- ggplot(data= reg.rr.s, aes(x= Location,
                                            y= mean_FvFm.rr,
                                            ymax= mean_FvFm.rr + se_FvFm.rr,
@@ -307,4 +393,22 @@ theme_pam <- theme(panel.grid = element_blank(),
     facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
     theme_pam
   ggsave(last_plot(), filename = file.path(dir_out_fig, "FvFm_rr.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
+
+
+  FvFm.rr.d1.p2 <- ggplot(data= reg.treat.rr.s, aes(x= Algae,
+                                                    y= mean_FvFm.rr,
+                                                    ymax= mean_FvFm.rr + se_FvFm.rr,
+                                                    ymin= mean_FvFm.rr - se_FvFm.rr))
+
+  FvFm.rr.d1.p2 +
+    yintercept +
+    geom_point() +
+    plot_errorbars +
+    #plot_points
+    #scale_y_continuous(limits= c(-1, 0.55), breaks= seq(-1, 0.76, by= 0.25), labels= c("-1.0", "", "0.5", "", "0.0", "", "0.5", "")) +
+    scale_x_discrete(labels= NULL) +
+    labs(x= "Algae", y= "Mean Fv/Fm response ratio (± se)", title= "Day 1 benthic & floating response ratio") +
+    facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels), scales= "free_x") +
+    theme_pam
+  ggsave(last_plot(), filename = file.path(dir_out_fig, "FvFm_rr_d1_p2.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
 
