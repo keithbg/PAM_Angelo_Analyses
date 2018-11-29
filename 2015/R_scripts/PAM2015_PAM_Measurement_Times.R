@@ -14,8 +14,8 @@ library(ggplot2)
 
 
 #### FILE PATHS ################################################################
-dir_input <- file.path("/Users","KeithBG","Dropbox","PAM_Angelo","2015", "PAM_data")
-dir_out_fig <- file.path("/Users","KeithBG","Dropbox","PAM_Angelo","2015", "Figures_Keith_2015")
+dir_input <- file.path("/Users","KeithBG","Dropbox","PAM_Angelo", "PAM_Angelo_Analyses", "2015", "PAM_data")
+dir_out_fig <- file.path("/Users","KeithBG","Dropbox","PAM_Angelo", "PAM_Angelo_Analyses", "2015", "Figures_Keith_2015")
 ################################################################################
 
 
