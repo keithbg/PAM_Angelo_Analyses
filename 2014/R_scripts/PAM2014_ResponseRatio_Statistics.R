@@ -23,7 +23,7 @@ dir_out_table <- file.path("/Users", "KeithBG", "Dropbox", "PAM_Angelo", "PAM_An
                 filter(Algae != "Blank") %>%
                 select(-Date, -Day, -Treatment, -Rep, -(Alpha:FvFm.d0)) %>%
                 rename(Treatment = Location) %>%
-                mutate(Rep= str_sub(rr.stats$uniqueID, start= -1),
+                mutate(Rep= str_sub(.$uniqueID, start= -1),
                        Algae= ifelse(Algae == "Cyano_Spires", "Ana_Spires",
                                      ifelse(Algae == "Phorm", "Microcoleus", Algae)))
 
@@ -70,12 +70,14 @@ pvalues.corrected <- pvalues %>%
 ## this is not a repeated measures design, we have already accounted for the repeated measures
 ## with the response ratio
 
-## degrees of freedom= 3 + 3 - 2= 4
+## degrees of freedom: Unpaired= 3 + 3 - 2= 4
+## degrees of freedom: Paired= 3-1=2
 
 ## Initialize data frame
 
 t.test.output <- data.frame(parameter= as.character(NA),
                             algae= as.character(NA),
+                            test= as.character(NA),
                             t_value= as.numeric(NA),
                             p_value= as.numeric(NA),
                             stringsAsFactors = FALSE)
@@ -92,7 +94,18 @@ for(param in c("Alpha.rr", "ETRm.rr", "FvFm.rr")){
              paired= FALSE,
              var.equal= FALSE,
              data= .)
-    t.test.output[count, ] <- c(str_replace(param, ".rr", ""), alga, round(output$statistic, 2), round(output$p.value, 4))
+    t.test.output[count, ] <- c(str_replace(param, ".rr", ""), alga, "unpaired", round(output$statistic, 2), round(output$p.value, 4))
+    count <- count + 1
+
+    output.paired <- rr.stats %>%
+      gather(parameter, value, Alpha.rr:FvFm.rr) %>%
+      filter(Algae == alga, parameter== param) %>%
+      arrange(Rep) %>%
+      t.test(value ~ Treatment,
+             paired= TRUE,
+             var.equal= FALSE,
+             data= .)
+    t.test.output[count, ] <- c(str_replace(param, ".rr", ""), alga, "paired", round(output.paired$statistic, 2), round(output.paired$p.value, 4))
 
     #print(alga)
     #print(output)

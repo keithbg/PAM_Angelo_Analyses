@@ -105,7 +105,9 @@ reg.rr <- reg.data %>%
          ETRm.rr= log(ETRm / ETRm.d0),
          FvFm.rr= log(FvFm / FvFm.d0)) %>%
   ungroup() %>%
-  filter(Day == 1)
+  filter(Day == 1) %>%
+  mutate(pair= ifelse(Rep == 1 | Rep == 2, "1:2",
+                      ifelse(Rep == 3 | Rep == 4, "3:4", "5:6")))
 write_tsv(reg.rr, path= file.path(dir_out_table, "PAM2014_clean_REG2_response_ratios.tsv") )
 
 
@@ -254,6 +256,25 @@ theme_pam <- theme(panel.grid = element_blank(),
     theme_pam
   ggsave(last_plot(), filename = file.path(dir_out_fig, "ETRmREG2_rr.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
 
+
+
+  ## ETRm response ratio, data points
+  ETRm.rr.p.paired <- ggplot(data= reg.rr, aes(x= Location, y= ETRm.rr, group= pair))
+
+  ETRm.rr.p.paired +
+    yintercept +
+    geom_line(aes(color= pair)) +
+    geom_point(aes(color= pair), size= 3) +
+    scale_y_continuous(limits= c(-1, 0.55), breaks= seq(-1, 0.76, by= 0.25), labels= c("-1.0", "", "0.5", "", "0.0", "", "0.5", "")) +
+    scale_color_discrete(name= "Replicate pair") +
+    #scale_shape_manual(values= treatment.shapes) +
+    scale_linetype_manual(values= treatment.linetype) +
+    labs(x= "Treatment", y= "ETRmax response ratio") +
+    facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
+    theme_pam
+  ggsave(last_plot(), filename = file.path(dir_out_fig, "ETRmREG2_rr_paired.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
+
+
   ## ETRm response ratio day 1
   ETRm.rr.d1.p <- ggplot(data= reg.treat.rr, aes(x= Algae,
                                           y= ETRm.rr)) #,
@@ -333,6 +354,23 @@ theme_pam <- theme(panel.grid = element_blank(),
     theme_pam
   ggsave(last_plot(), filename = file.path(dir_out_fig, "AlphaREG2_rr.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
 
+  ## Alpha response ratio, data points
+  Alpha.rr.p.paired <- ggplot(data= reg.rr, aes(x= Location, y= Alpha.rr, group= pair))
+
+  Alpha.rr.p.paired +
+    yintercept +
+    geom_line(aes(color= pair)) +
+    geom_point(aes(color= pair), size= 3) +
+    scale_y_continuous(limits= c(-1.5, 0.3), breaks= seq(-1.55, 0.25, by= 0.25), labels= c("-1.5", "",  "-1.0", "", "-0.5", "", "0.0", "")) +
+    scale_color_discrete(name= "Replicate pair") +
+    #scale_shape_manual(values= treatment.shapes) +
+    scale_linetype_manual(values= treatment.linetype) +
+    labs(x= "Treatment", y= "Alpha response ratio") +
+    facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
+    theme_pam
+  ggsave(last_plot(), filename = file.path(dir_out_fig, "AlphaREG2_rr_paired.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
+
+
 
   Alpha.rr.d1.p2 <- ggplot(data= reg.treat.rr.s, aes(x= Algae,
                                                      y= mean_Alpha.rr,
@@ -393,6 +431,23 @@ theme_pam <- theme(panel.grid = element_blank(),
     facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
     theme_pam
   ggsave(last_plot(), filename = file.path(dir_out_fig, "FvFm_rr.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
+
+
+  ## FvFm response ratio, data points
+  FvFm.rr.p.paired <- ggplot(data= reg.rr, aes(x= Location, y= FvFm.rr, group= pair))
+
+  FvFm.rr.p.paired +
+    yintercept +
+    geom_line(aes(color= pair)) +
+    geom_point(aes(color= pair), size= 3) +
+    scale_y_continuous(limits= c(-0.95, 0.3), breaks= seq(-0.8, 0.2, by= 0.2), labels= c("-0.8",  "", "0.04", "", "0.0", "")) +
+    scale_color_discrete(name= "Replicate pair") +
+    scale_linetype_manual(values= treatment.linetype) +
+    labs(x= "Treatment", y= "Fv/Fm response ratio") +
+    facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
+    theme_pam
+  ggsave(last_plot(), filename = file.path(dir_out_fig, "FvFm_rr_paired.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
+
 
 
   FvFm.rr.d1.p2 <- ggplot(data= reg.treat.rr.s, aes(x= Algae,
