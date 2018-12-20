@@ -3,7 +3,7 @@
 
 ## Response ratios calculated in PAM2015_ResponseRatios_Format.R
 ## TSV file exported from this script: PAM2015_response_ratios_stats.tsv
-## data in: /Users/KeithBG/Dropbox/PAM_Angelo/2015/PAM_data
+## data in: /Users/kbg/Dropbox/PAM_Angelo/2015/PAM_data
 
 
 #### Libraries #################################################################
@@ -15,7 +15,7 @@ library(lmTest)
 
 
 #### FILE PATHS ################################################################
-dir_input <- file.path("/Users","KeithBG","Dropbox","PAM_Angelo","2015", "PAM_data")
+dir_input <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "PAM_Angelo_Analyses", "2015", "PAM_data")
 ################################################################################
 
 #### READ IN DATA ##############################################################

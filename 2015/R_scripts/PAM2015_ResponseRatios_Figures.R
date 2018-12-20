@@ -3,7 +3,7 @@
 
 ## Response ratios calculated in PAM2015_ResponseRatios_Format.R
 ## TSV file exported from this script: PAM_2015_response_ratios_figures.tsv
-## data in: /Users/KeithBG/Dropbox/PAM_Angelo/2015/PAM_data
+## data in: /Users/kbg/Dropbox/PAM_Angelo/2015/PAM_data
 
 
 #### Libraries #################################################################
@@ -14,8 +14,8 @@ library(grDevices)
 
 
 #### FILE PATHS ################################################################
-dir_input <- file.path("/Users","KeithBG","Dropbox","PAM_Angelo","2015", "PAM_data")
-dir_out_fig <- file.path("/Users","KeithBG","Dropbox","PAM_Angelo","2015", "Figures")
+dir_input <- file.path("/Users","kbg","Dropbox","PAM_Angelo","2015", "PAM_data")
+dir_out_fig <- file.path("/Users","kbg","Dropbox","PAM_Angelo","2015", "Figures")
 ################################################################################
 
 #### READ IN DATA ##############################################################

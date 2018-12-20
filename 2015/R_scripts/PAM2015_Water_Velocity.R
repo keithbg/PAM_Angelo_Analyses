@@ -2,7 +2,7 @@
 ## Water velocity measured with a Pygmy flow meter
 ## Depth in centimeters; velocity in meters / second
 
-## data in: /Users/KeithBG/Dropbox/PAM_Angelo/2015/PAM_data
+## data in: /Users/kbg/Dropbox/PAM_Angelo/2015/PAM_data
 
 
 #### Libraries #################################################################
@@ -13,8 +13,8 @@ library(ggplot2)
 
 
 #### FILE PATHS ################################################################
-dir_input <- file.path("/Users","KeithBG","Dropbox","PAM_Angelo","2015", "PAM_data")
-dir_out_fig <- file.path("/Users","KeithBG","Dropbox","PAM_Angelo","2015", "Figures")
+dir_input <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "PAM_Angelo_Analyses", "2015", "PAM_data")
+dir_out_fig <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "PAM_Angelo_Analyses", "2015", "Figures")
 ################################################################################
 
 #### READ IN AND FORMAT DATA ##############################################################
@@ -72,7 +72,7 @@ vel.plot2 +
   scale_shape_manual(values= treatment.shapes) +
   scale_x_discrete(labels= c("Margin", "Thalweg")) +
   theme_velocity
-ggsave(last_plot(), filename = file.path(dir_out_fig, "water_velocity_plot.pdf"), height= 6.4, width= 8, units= "in")
+ggsave(last_plot(), filename = file.path(dir_out_fig, "water_velocity_plot.pdf"), height= 6.4, width= 8, units= "in", device= cairo_pdf)
 
 
 

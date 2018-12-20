@@ -4,7 +4,7 @@
 ## and removed after the last PAM measurement on the afternoon of June 15
 ## ibuttons recorded temperature in Celsius every 10 minutes
 
-## data in: /Users/KeithBG/Dropbox/PAM_Angelo/2015/PAM_data/ibutton_data
+## data in: /Users/kbg/Dropbox/PAM_Angelo/2015/PAM_data/ibutton_data
 
 #### Libraries #################################################################
 library(tidyverse)
@@ -13,14 +13,14 @@ library(stringr)
 library(ggplot2)
 library(scales)
 library(lme4)
-source("/Users/KeithBG/R_Functions/ibutton_BatchImport_14Oct2015.R")
+source("/Users/kbg/R_Functions/ibutton_BatchImport_14Oct2015.R")
 ################################################################################
 
 
 #### FILE PATHS ################################################################
-dir_input <- file.path("/Users","KeithBG","Dropbox","PAM_Angelo","2015", "PAM_data")
-dir_out_fig <- file.path("/Users","KeithBG","Dropbox","PAM_Angelo","2015", "Figures")
-dir_out_table <- file.path("/Users","KeithBG","Dropbox","PAM_Angelo","2015", "PAM_data")
+dir_input <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "PAM_Angelo_Analyses", "2015", "PAM_data")
+dir_out_fig <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "PAM_Angelo_Analyses", "2015", "Figures")
+dir_out_table <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "PAM_Angelo_Analyses", "2015", "PAM_data")
 ################################################################################
 
 #### READ IN AND FORMAT DATA ###################################################
@@ -87,7 +87,7 @@ anova(fit.min.t)$"Pr(>F)"
 p.adjust(c(anova(fit.max.t)$"Pr(>F)", anova(fit.mean.t)$"Pr(>F)", anova(fit.min.t)$"Pr(>F)"))
 
 plot(max.t ~ as.factor(Treatment), data= subset(pam.ib.stats, Site != "4"))
-plot(min.t ~ as.factor(Treatment), data= subset(pam.ib.stats, Site != "4"))
+plot(mean.t ~ as.factor(Treatment), data= subset(pam.ib.stats, Site != "4"))
 plot(min.t ~ as.factor(Treatment), data= subset(pam.ib.stats, Site != "4"))
 
 

@@ -11,11 +11,11 @@ library(ggplot2)
 ################################################################################
 
 #### FILE PATHS ################################################################
-dir_input <- file.path("/Users", "KeithBG", "Dropbox", "PAM_Angelo", "2014", "Data")
-dir_out_fig <- file.path("/Users", "KeithBG", "Dropbox", "PAM_Angelo", "2014", "Figures")
+dir_input <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "PAM_data")
+dir_out_fig <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "Figures")
 ################################################################################
 
-lc.df <- read_tsv(file.path(dir_input, "PAM2014_clean_light_curve.tsv")) %>%
+lc.df <- read_tsv(file.path(dir_input, "PAM2014_clean_light_curve2.tsv")) %>%
            mutate_at(vars(PAR:FvFm), funs(as.numeric(.)))
 
 ## Summarize among the replicates
@@ -88,13 +88,13 @@ lc.p +
   plot_lines_lc +
   plot_errorbars_lc +
   plot_points_lc +
-  scale_x_continuous(limits= c(0, 1250), expand= c(0.02, 0)) +
+  #scale_x_continuous(limits= c(0, 1250), expand= c(0.02, 0)) +
   scale_fill_manual(values= treatment.fill) +
   scale_shape_manual(values= treatment.shapes) +
   scale_linetype_manual(values= treatment.linetype) +
   labs(x=expression(paste("PAR (",mu,"Mols ",m^{-2}," ", s^{-1}, ")")), y="Mean relative electron transport rate (± se)") +
   facet_grid(Algae~Day, labeller= labeller(Algae= algae.facet.labels, Day= day.facet.labels)) +
   theme_pam
-ggsave(last_plot(), filename = file.path(dir_out_fig, "PAM2014_LightCurves.pdf"), height= 8, width= 6.4, units= "in", device = cairo_pdf)
+ggsave(last_plot(), filename = file.path(dir_out_fig, "PAM2014_LightCurves_all_Irradiance.pdf"), height= 8, width= 6.4, units= "in", device = cairo_pdf)
 
 

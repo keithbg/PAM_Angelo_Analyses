@@ -10,12 +10,12 @@ library(ggmap)
 library(rgdal)
 library(broom)
 library(ggsn)
-#source("/Users/KeithBG/R_functions/ggplot_scalebar_north_arrow.R")
+#source("/Users/kbg/R_functions/ggplot_scalebar_north_arrow.R")
 ################################################################################
 
 #### FILE PATHS ################################################################
-gis_input <- file.path("/Users","KeithBG","Dropbox","PAM_Angelo","PAM_Angelo_Analyses", "Maps", "GIS_files")
-dir_output <- file.path("/Users","KeithBG","Dropbox","PAM_Angelo","PAM_Angelo_Analyses", "Maps")
+gis_input <- file.path("/Users","kbg","Dropbox","PAM_Angelo","PAM_Angelo_Analyses", "Maps", "GIS_files")
+dir_output <- file.path("/Users","kbg","Dropbox","PAM_Angelo","PAM_Angelo_Analyses", "Maps")
 ################################################################################
 
 

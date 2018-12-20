@@ -9,8 +9,8 @@ library(stringr)
 
 
 #### FILE PATHS ################################################################
-dir_input <- file.path("/Users","KeithBG","Dropbox","PAM_Angelo","2015", "PAM_data")
-dir_out <- file.path("/Users","KeithBG","Dropbox","PAM_Angelo","2015", "PAM_data")
+dir_input <- file.path("/Users","kbg","Dropbox","PAM_Angelo","2015", "PAM_data")
+dir_out <- file.path("/Users","kbg","Dropbox","PAM_Angelo","2015", "PAM_data")
 ################################################################################
 
 
@@ -62,7 +62,7 @@ reg.data <- read.table(file.path(dir_input, "PAM2015_data_aggregated.tsv"), sep=
 
 
 #### RUN SCRIPT TO CALCULATE REGRESSION PARAMETERS (ALPHA, Ek, ETRmax)
-source("/Users/KeithBG/R_Functions/PAM.get.reg.output.R")
+source("/Users/kbg/R_Functions/PAM.get.reg.output.R")
 lc.parameters <- PAM.regression.batch(input.df=reg.data) %>%
   mutate(rss= ifelse(REG1.RSS < REG2.RSS, "Y", "N"),
          Day= yday(Date) - yday(unique(Date)[1]))

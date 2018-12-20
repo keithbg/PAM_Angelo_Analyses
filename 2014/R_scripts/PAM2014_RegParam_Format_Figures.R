@@ -11,9 +11,9 @@ library(stringr)
 ################################################################################
 
 #### FILE PATHS ################################################################
-dir_input <- file.path("/Users", "KeithBG", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "PAM_data")
-dir_out_fig <- file.path("/Users", "KeithBG", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "Figures")
-dir_out_table <- file.path("/Users", "KeithBG", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "Data")
+dir_input <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "PAM_data")
+dir_out_fig <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "Figures")
+dir_out_table <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "Data")
 ################################################################################
 
 

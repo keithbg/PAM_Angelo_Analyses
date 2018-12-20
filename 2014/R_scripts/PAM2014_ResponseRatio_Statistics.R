@@ -14,8 +14,8 @@ library(tidyverse)
 ################################################################################
 
 #### FILE PATHS ################################################################
-dir_input <- file.path("/Users", "KeithBG", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "PAM_data")
-dir_out_table <- file.path("/Users", "KeithBG", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "PAM_data")
+dir_input <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "PAM_data")
+dir_out_table <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "PAM_data")
 ################################################################################
 
 

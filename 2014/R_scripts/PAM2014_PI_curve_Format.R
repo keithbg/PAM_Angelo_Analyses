@@ -12,10 +12,10 @@
 ################################################################################
 
 #### FILE PATHS ################################################################
-#dir_input <- file.path("/Users", "KeithBG", "Dropbox", "Keith_PAM_24Jul2014", "PAM_2014")
-#dir_output <- file.path("/Users", "KeithBG", "Dropbox", "Keith_PAM_24Jul2014", "PAM_2014", "R_formated_data")
-dir_input <- file.path("/Users", "KeithBG", "Dropbox", "PAM_Angelo", "2014", "Data", "raw_data")
-dir_output <- file.path("/Users", "KeithBG", "Dropbox", "PAM_Angelo", "2014", "Data")
+#dir_input <- file.path("/Users", "kbg", "Dropbox", "Keith_PAM_24Jul2014", "PAM_2014")
+#dir_output <- file.path("/Users", "kbg", "Dropbox", "Keith_PAM_24Jul2014", "PAM_2014", "R_formated_data")
+dir_input <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "PAM_data", "raw_data")
+dir_output <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "PAM_data")
 ################################################################################
 
 
@@ -35,7 +35,7 @@ new.column.names <- c("Date", "Time", "Rep", "Treatment", "Location", "Algae", "
          filter(Algae != "") %>%
          select(-Comments) %>%
          rename_all(funs(c(new.column.names))) %>%
-         filter(PAR < 1250) %>% # Trim off the end of the light curves, only some of the Cladophora had PAR >1250
+         #filter(PAR < 1250) %>% # Trim off the end of the light curves, only some of the Cladophora had PAR >1250
          mutate(Date= as.Date(Date, "%m/%d/%y"),
                 F0_Menupoint= as.character(F0_Menupoint),
                 Location= ifelse((Rep == 1 | Rep ==3 | Rep == 5), "Benthic", "Floating"),
@@ -66,11 +66,11 @@ new.column.names <- c("Date", "Time", "Rep", "Treatment", "Location", "Algae", "
   pi.df %>%
     arrange(Date, Mem) %>%
     select(Date, Day, Time:Algae, TreatID, uniqueID, Day, everything()) %>%
-    write_tsv(path= file.path(dir_output, "PAM2014_clean_light_curve.tsv"))
+    write_tsv(path= file.path(dir_output, "PAM2014_clean_light_curve2.tsv"))
 
 
 ####  CALCULATE REGRESSION PARAMETERS (ALPHA, Ek, ETRmax)
-  source("/Users/KeithBG/R_Functions/PAM.regression.formulas.R") # Function written by Yvonne's colleague Katy (I think that is her name)
+  source("/Users/kbg/R_Functions/PAM.regression.formulas.R") # Function written by Yvonne's colleague Katy (I think that is her name)
 
   reg.params <- pi.df %>%
     filter(F0_Menupoint == "17") %>%

@@ -3,7 +3,7 @@
 
 ## Data formating in  PAM2015_ResponseRatios_Format.R
 ## and exported as a TSV file: PAM2015_regression_parameters.tsv
-## data in: /Users/KeithBG/Dropbox/PAM_Angelo/2015/PAM_data
+## data in: /Users/kbg/Dropbox/PAM_Angelo/2015/PAM_data
 
 
 #### Libraries #################################################################
@@ -14,8 +14,8 @@ library(lubridate)
 
 
 #### FILE PATHS ################################################################
-dir_input <- file.path("/Users","KeithBG","Dropbox","PAM_Angelo","2015", "PAM_data")
-dir_out_fig <- file.path("/Users","KeithBG","Dropbox","PAM_Angelo","2015", "Figures_Keith_2015")
+dir_input <- file.path("/Users","kbg","Dropbox","PAM_Angelo","2015", "PAM_data")
+dir_out_fig <- file.path("/Users","kbg","Dropbox","PAM_Angelo","2015", "Figures_Keith_2015")
 ################################################################################
 
 #### READ IN AND FORMAT DATA ##############################################################
