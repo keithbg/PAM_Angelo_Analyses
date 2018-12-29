@@ -13,7 +13,7 @@ library(stringr)
 #### FILE PATHS ################################################################
 dir_input <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "PAM_data")
 dir_out_fig <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "Figures")
-dir_out_table <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "Data")
+dir_out_table <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "PAM_data")
 ################################################################################
 
 
@@ -22,7 +22,9 @@ dir_out_table <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo
 #### in script PAM2014_PI_curve_Format.R
 reg.data <- read_tsv(file.path(dir_input, "PAM2014_clean_REG_params.tsv")) %>%
              select(-contains("REG1"), -REG2.RSS) %>%
-             rename(Alpha= REG2.alpha, ETRm= REG2.ETRm, Ek= REG2.Ek)
+             rename(Alpha= REG2.alpha, ETRm= REG2.ETRm, Ek= REG2.Ek) %>% 
+             mutate(Location= as.factor(ifelse(Location == "Benthic", "Submerged", "Floating")))
+reg.data$Location <- factor(reg.data$Location, levels= levels(reg.data$Location)[c(2, 1)])
 
 
 ##### PREVIOUS CALCULATIONS FROM YVONNE #######################################
@@ -128,8 +130,8 @@ reg.rr.s <- reg.rr %>%
                 se_FvFm.rr = sd_FvFm.rr / sqrt(N)) %>%
               ungroup()
 
-## Benthic/Floating response ratios
-   ## Calculate the response ratio for floating and benthic parameter values for day 1 for each replicate
+## Submerged/Floating response ratios
+   ## Calculate the response ratio for floating and Submerged parameter values for day 1 for each replicate
 
 ## Set up new data frame
 reg.data.treatment.d1 <- reg.data %>%
@@ -143,10 +145,11 @@ reg.data.treatment.d1 <- reg.data %>%
 ## Calculate response ratios
 reg.treat.rr <- reg.data.treatment.d1 %>%
                   group_by(Rep, Algae) %>%
-                  mutate(Alpha.rr= log(Floating_Alpha / Benthic_Alpha),
-                         ETRm.rr= log(Floating_ETRm / Benthic_ETRm),
-                         FvFm.rr= log(Floating_FvFm / Benthic_FvFm)) %>%
+                  mutate(Alpha.rr= log(Floating_Alpha / Submerged_Alpha),
+                         ETRm.rr= log(Floating_ETRm / Submerged_ETRm),
+                         FvFm.rr= log(Floating_FvFm / Submerged_FvFm)) %>%
                   ungroup()
+
 ## Summarize response ratios over replicates
 reg.treat.rr.s <- reg.treat.rr %>%
                    group_by(Algae) %>%
@@ -175,12 +178,19 @@ plot_lines <- geom_line(aes(group= Location, linetype= Location), position= posi
 yintercept <- geom_hline(yintercept = 0, size= 0.25)
 x_axis_day <- scale_x_discrete(breaks= c(0, 1), labels= c("23-Jul", "24-Jul"))
 treatment.fill <- c("black", "white")
+treatment.labels <- c("Submerged", "Floating")
 treatment.linetype <- c("solid", "dashed")
 treatment.shapes <- c(21, 21)
+treatment.legend <- "Treatment"
 
-ETR.label <- paste("Mean ETRmax (± se)")
-Alpha.label <- paste("Mean alpha (± se)")
-Ek.label <- paste("Mean Ek (± se)")
+
+ETR.rr.label <- expression(rETR[max]~" response ratio (± se)")
+ETR.label <- expression(rETR[max]~" (± se)")
+Alpha.label <- paste("Alpha (± se)")
+Alpha.rr.label <- paste("Alpha response ratio (± se)")
+
+FvFm.label <- expression(F[v]/F[m]~" (± se)")
+FvFm.rr.label <- expression(F[v]/F[m]~" response ratio (± se)")
 
 
 algae.facet.labels <- as_labeller(c(`Cyano_Spires` = "Anabaena\nSpires",
@@ -225,13 +235,12 @@ theme_pam <- theme(panel.grid = element_blank(),
     plot_errorbars +
     plot_points +
     scale_y_continuous(limits= c(17, 80), breaks= seq(20, 80, by= 10), labels= c("20", "", "40", "", "60", "", "80")) +
-    scale_fill_manual(values= treatment.fill) +
-    scale_shape_manual(values= treatment.shapes) +
-    scale_linetype_manual(values= treatment.linetype) +
+    scale_fill_manual(values= treatment.fill, labels= treatment.labels, name= treatment.legend) +
+    scale_shape_manual(values= treatment.shapes, labels= treatment.labels, name= treatment.legend) +
+    scale_linetype_manual(values= treatment.linetype, labels= treatment.labels, name= treatment.legend) +
     labs(x= "", y= ETR.label) +
     x_axis_day +
     facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
-    #facet_grid(.~Algae) +
     theme_pam
   ggsave(last_plot(), filename = file.path(dir_out_fig, "ETRmREG2.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
 
@@ -248,10 +257,10 @@ theme_pam <- theme(panel.grid = element_blank(),
     plot_errorbars +
     plot_points +
     scale_y_continuous(limits= c(-1, 0.55), breaks= seq(-1, 0.76, by= 0.25), labels= c("-1.0", "", "0.5", "", "0.0", "", "0.5", "")) +
-    scale_fill_manual(values= treatment.fill) +
-    scale_shape_manual(values= treatment.shapes) +
-    scale_linetype_manual(values= treatment.linetype) +
-    labs(x= "Treatment", y= "Mean ETRmax response ratio (± se)") +
+    scale_fill_manual(values= treatment.fill, labels= treatment.labels, name= treatment.legend) +
+    scale_shape_manual(values= treatment.shapes, labels= treatment.labels, name= treatment.legend) +
+    scale_linetype_manual(values= treatment.linetype, labels= treatment.labels, name= treatment.legend) +
+    labs(x= "Treatment", y= ETR.rr.label) +
     facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
     theme_pam
   ggsave(last_plot(), filename = file.path(dir_out_fig, "ETRmREG2_rr.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
@@ -268,8 +277,8 @@ theme_pam <- theme(panel.grid = element_blank(),
     scale_y_continuous(limits= c(-1, 0.55), breaks= seq(-1, 0.76, by= 0.25), labels= c("-1.0", "", "0.5", "", "0.0", "", "0.5", "")) +
     scale_color_discrete(name= "Replicate pair") +
     #scale_shape_manual(values= treatment.shapes) +
-    scale_linetype_manual(values= treatment.linetype) +
-    labs(x= "Treatment", y= "ETRmax response ratio") +
+    scale_linetype_manual(values= treatment.linetype, name= treatment.legend) +
+    labs(x= "Treatment", y= ETR.label) +
     facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
     theme_pam
   ggsave(last_plot(), filename = file.path(dir_out_fig, "ETRmREG2_rr_paired.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
@@ -288,7 +297,7 @@ theme_pam <- theme(panel.grid = element_blank(),
     #plot_points
     #cale_y_continuous(limits= c(-1, 0.55), breaks= seq(-1, 0.76, by= 0.25), labels= c("-1.0", "", "0.5", "", "0.0", "", "0.5", "")) +
     scale_x_discrete(labels= NULL) +
-    labs(x= "Algae", y= "ETRmax response ratio", title= "Day 1 benthic & floating response ratio") +
+    labs(x= "Algae", y= "ETRmax response ratio", title= "Day 1 submerged & floating response ratio") +
     facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels), scales= "free_x") +
     theme_pam
   ggsave(last_plot(), filename = file.path(dir_out_fig, "ETRmREG2_rr_d1_p1.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
@@ -304,7 +313,7 @@ theme_pam <- theme(panel.grid = element_blank(),
     #plot_points
     #scale_y_continuous(limits= c(-1, 0.55), breaks= seq(-1, 0.76, by= 0.25), labels= c("-1.0", "", "0.5", "", "0.0", "", "0.5", "")) +
     scale_x_discrete(labels= NULL) +
-    labs(x= "Algae", y= "Mean ETRmax response ratio (± se)", title= "Day 1 benthic & floating response ratio") +
+    labs(x= "Algae", y= "ETRmax response ratio (± se)", title= "Day 1 submerged & floating response ratio") +
     facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels), scales= "free_x") +
     theme_pam
   ggsave(last_plot(), filename = file.path(dir_out_fig, "ETRmREG2_rr_d1_p2.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
@@ -325,9 +334,9 @@ theme_pam <- theme(panel.grid = element_blank(),
     plot_errorbars +
     plot_points +
     scale_y_continuous(limits= c(0.04, 0.167), breaks= seq(0.04, 0.16, by= 0.02), labels= c("0.04", "", "0.08", "", "0.12", "", "0.16")) +
-    scale_fill_manual(values= treatment.fill) +
-    scale_shape_manual(values= treatment.shapes) +
-    scale_linetype_manual(values= treatment.linetype) +
+    scale_fill_manual(values= treatment.fill, labels= treatment.labels, name= treatment.legend) +
+    scale_shape_manual(values= treatment.shapes, labels= treatment.labels, name= treatment.legend) +
+    scale_linetype_manual(values= treatment.linetype, labels= treatment.labels, name= treatment.legend) +
     labs(x= "", y= Alpha.label) +
     x_axis_day +
     facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
@@ -346,10 +355,10 @@ theme_pam <- theme(panel.grid = element_blank(),
     plot_errorbars +
     plot_points +
     scale_y_continuous(limits= c(-1.2, 0.3), breaks= seq(-1.25, 0.25, by= 0.25), labels= c("",  "-1.0", "", "-0.5", "", "0.0", "")) +
-    scale_fill_manual(values= treatment.fill) +
-    scale_shape_manual(values= treatment.shapes) +
-    scale_linetype_manual(values= treatment.linetype) +
-    labs(x= "Treatment", y= "Mean alpha response ratio (± se)") +
+    scale_fill_manual(values= treatment.fill, labels= treatment.labels, name= treatment.legend) +
+    scale_shape_manual(values= treatment.shapes, labels= treatment.labels, name= treatment.legend) +
+    scale_linetype_manual(values= treatment.linetype, labels= treatment.labels, name= treatment.legend) +
+    labs(x= "Treatment", y= Alpha.rr.label) +
     facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
     theme_pam
   ggsave(last_plot(), filename = file.path(dir_out_fig, "AlphaREG2_rr.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
@@ -384,7 +393,7 @@ theme_pam <- theme(panel.grid = element_blank(),
     #plot_points
     #scale_y_continuous(limits= c(-1, 0.55), breaks= seq(-1, 0.76, by= 0.25), labels= c("-1.0", "", "0.5", "", "0.0", "", "0.5", "")) +
     scale_x_discrete(labels= NULL) +
-    labs(x= "Algae", y= "Mean Alpha response ratio (± se)", title= "Day 1 benthic & floating response ratio") +
+    labs(x= "Algae", y= "Alpha response ratio (± se)", title= "Day 1 submerged & floating response ratio") +
     facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels), scales= "free_x") +
     theme_pam
   ggsave(last_plot(), filename = file.path(dir_out_fig, "AlphaREG2_rr_d1_p2.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
@@ -403,10 +412,10 @@ theme_pam <- theme(panel.grid = element_blank(),
     plot_errorbars +
     plot_points +
     scale_y_continuous(limits= c(0.12, 0.63), breaks= seq(0.1, 0.6, by= 0.1), labels= c("", "0.2", "", "0.4", "", "0.6")) +
-    scale_fill_manual(values= treatment.fill) +
-    scale_shape_manual(values= treatment.shapes) +
-    scale_linetype_manual(values= treatment.linetype) +
-    labs(x= "", y= "Mean Fv/Fm response ratio (± se)") +
+    scale_fill_manual(values= treatment.fill, name= treatment.legend) +
+    scale_shape_manual(values= treatment.shapes, name= treatment.legend) +
+    scale_linetype_manual(values= treatment.linetype, name= treatment.legend) +
+    labs(x= "", y= FvFm.label) +
     x_axis_day +
     facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
     theme_pam
@@ -424,14 +433,13 @@ theme_pam <- theme(panel.grid = element_blank(),
     plot_errorbars +
     plot_points +
     scale_y_continuous(limits= c(-0.9, 0.3), breaks= seq(-0.8, 0.2, by= 0.2), labels= c("-0.8",  "", "0.04", "", "0.0", "")) +
-    scale_fill_manual(values= treatment.fill) +
-    scale_shape_manual(values= treatment.shapes) +
-    scale_linetype_manual(values= treatment.linetype) +
-    labs(x= "Treatment", y= "Mean Fv/Fm response ratio (± se)") +
+    scale_fill_manual(values= treatment.fill, name= treatment.legend) +
+    scale_shape_manual(values= treatment.shapes, name= treatment.legend) +
+    scale_linetype_manual(values= treatment.linetype, name= treatment.legend) +
+    labs(x= "Treatment", y= FvFm.rr.label) +
     facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
     theme_pam
   ggsave(last_plot(), filename = file.path(dir_out_fig, "FvFm_rr.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
-
 
   ## FvFm response ratio, data points
   FvFm.rr.p.paired <- ggplot(data= reg.rr, aes(x= Location, y= FvFm.rr, group= pair))
@@ -442,8 +450,8 @@ theme_pam <- theme(panel.grid = element_blank(),
     geom_point(aes(color= pair), size= 3) +
     scale_y_continuous(limits= c(-0.95, 0.3), breaks= seq(-0.8, 0.2, by= 0.2), labels= c("-0.8",  "", "0.04", "", "0.0", "")) +
     scale_color_discrete(name= "Replicate pair") +
-    scale_linetype_manual(values= treatment.linetype) +
-    labs(x= "Treatment", y= "Fv/Fm response ratio") +
+    scale_linetype_manual(values= treatment.linetype, name= treatment.legend) +
+    labs(x= "Treatment", y= FvFm.rr.label) +
     facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
     theme_pam
   ggsave(last_plot(), filename = file.path(dir_out_fig, "FvFm_rr_paired.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
@@ -462,7 +470,7 @@ theme_pam <- theme(panel.grid = element_blank(),
     #plot_points
     #scale_y_continuous(limits= c(-1, 0.55), breaks= seq(-1, 0.76, by= 0.25), labels= c("-1.0", "", "0.5", "", "0.0", "", "0.5", "")) +
     scale_x_discrete(labels= NULL) +
-    labs(x= "Algae", y= "Mean Fv/Fm response ratio (± se)", title= "Day 1 benthic & floating response ratio") +
+    labs(x= "Algae", y= FvFm.rr.label, title= "Day 1 submerged & floating response ratio") +
     facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels), scales= "free_x") +
     theme_pam
   ggsave(last_plot(), filename = file.path(dir_out_fig, "FvFm_rr_d1_p2.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)

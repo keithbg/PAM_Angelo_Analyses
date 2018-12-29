@@ -1,4 +1,4 @@
-## Figures for the PAM 2014 experiment
+`## Figures for the PAM 2014 experiment
 ## with Yvonne, Paula, and Mary
 
 ## KBG Oct-2018
@@ -16,7 +16,10 @@ dir_out_fig <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_A
 ################################################################################
 
 lc.df <- read_tsv(file.path(dir_input, "PAM2014_clean_light_curve2.tsv")) %>%
-           mutate_at(vars(PAR:FvFm), funs(as.numeric(.)))
+           mutate_at(vars(PAR:FvFm), funs(as.numeric(.))) %>% 
+           mutate(Location= as.factor(ifelse(Location == "Benthic", "Submerged", "Floating")))
+lc.df$Location <- factor(lc.df$Location, levels= levels(lc.df$Location)[c(2, 1)])
+
 
 ## Summarize among the replicates
 lc.df.s <- lc.df %>%
@@ -42,8 +45,9 @@ x_axis_format <- scale_x_discrete(breaks= c(0, 1), labels= c("23-Jul", "24-Jul")
 treatment.fill <- c("black", "white")
 treatment.linetype <- c("solid", "dashed")
 treatment.shapes <- c(21, 21)
+treatment.legend <- "Treatment"
 
-ETR.label <- paste("Mean ETRmax (± se)")
+ETR.label <- paste("rETRmax (± se)")
 
 
 algae.facet.labels <- as_labeller(c(`Cyano_Spires` = "Anabaena\nSpires",
@@ -72,7 +76,7 @@ theme_pam <- theme(panel.grid = element_blank(),
                    strip.background = element_rect(fill="transparent", color= "transparent"),
                    axis.text.x = element_text(angle= 45, hjust= 1),
                    legend.position = "top")
-unique(lc.df.s$Algae)
+
 
 #### MAKE PLOTS ################################################################
 
@@ -88,13 +92,13 @@ lc.p +
   plot_lines_lc +
   plot_errorbars_lc +
   plot_points_lc +
-  #scale_x_continuous(limits= c(0, 1250), expand= c(0.02, 0)) +
-  scale_fill_manual(values= treatment.fill) +
-  scale_shape_manual(values= treatment.shapes) +
-  scale_linetype_manual(values= treatment.linetype) +
-  labs(x=expression(paste("PAR (",mu,"Mols ",m^{-2}," ", s^{-1}, ")")), y="Mean relative electron transport rate (± se)") +
+  scale_x_continuous(limits= c(0, 1250), expand= c(0.02, 0)) +
+  scale_fill_manual(values= treatment.fill, name= treatment.legend) +
+  scale_shape_manual(values= treatment.shapes, name= treatment.legend) +
+  scale_linetype_manual(values= treatment.linetype, name= treatment.legend) +
+  labs(x=expression(paste("PAR (",mu,"Mols ",m^{-2}," ", s^{-1}, ")")), y="rETR (± se)") +
   facet_grid(Algae~Day, labeller= labeller(Algae= algae.facet.labels, Day= day.facet.labels)) +
   theme_pam
-ggsave(last_plot(), filename = file.path(dir_out_fig, "PAM2014_LightCurves_all_Irradiance.pdf"), height= 8, width= 6.4, units= "in", device = cairo_pdf)
+ggsave(last_plot(), filename = file.path(dir_out_fig, "PAM2014_LightCurves.pdf"), height= 8, width= 6.4, units= "in", device = cairo_pdf)
 
 

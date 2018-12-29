@@ -5,7 +5,7 @@
 
 #### LIBRARIES #################################################################
 library(tidyverse)
-library(stringr)
+library(lubridate)
 library(ggplot2)
 library(scales)
 ################################################################################
@@ -23,16 +23,17 @@ source("/Users/kbg/R_Functions/ibutton_BatchImport_14Oct2015.R")
   pam.ib <- ibutton.batch.import(dir_input) %>%
     filter(DateTimeR >= "2014-07-24 06:00:00" & DateTimeR <= "2014-07-24 16:30:00") %>%
     mutate(DateTimeRound= round_date(DateTimeR, "10 mins"), # round to every 10 minutes
-           Location= ifelse((ID == "Rep1" | ID == "Rep3" | ID == "Rep5"), "Benthic", "Floating"),
+           Location= as.factor(ifelse((ID == "Rep1" | ID == "Rep3" | ID == "Rep5"), "Submerged", "Floating")),
            Rep= ifelse(ID == "Rep1" | ID == "Rep2", "1",
                        ifelse(ID == "Rep3" | ID == "Rep4", "2", "3")))
-#rm(pam.ib)
-
+  pam.ib$Location <- factor(pam.ib$Location, levels= levels(pam.ib$Location)[c(2, 1)])
+  
 
 ##### PLOTTING PARAMETERS ######################################################
   treatment.color <- c("DodgerBlue", "firebrick2")
   rep.color <- c("DodgerBlue", "limegreen", "purple4")
   treatment.linetype <- c("dashed", "solid")
+  treatment.legend <- "Treatment"
   x.axis.labels <- paste0(str_pad(6:17, width = 2, pad= "0"), ":00")
 
 
@@ -66,7 +67,7 @@ source("/Users/kbg/R_Functions/ibutton_BatchImport_14Oct2015.R")
     scale_y_continuous(limits= c(18, 28), breaks= seq(18, 28, by= 1), labels= c("18", "", "20", "", "22", "", "24", "", "26", "", "28"), expand= c(0.02, 0)) +
     scale_x_datetime(date_breaks = "1 hour", labels = x.axis.labels, expand= c(0, 0)) +
     #scale_x_datetime(date_breaks = "1 hour", expand= c(0, 0)) +
-    scale_color_manual(values= treatment.color, name= "Treatment") +
+    scale_color_manual(values= treatment.color, name= treatment.legend) +
     theme_ibutton
   ggsave(last_plot(), filename = file.path(dir_out_fig, "PAM2014_temperature_plot.pdf"), height= 6.4, width= 8, units= "in")
 
@@ -81,7 +82,7 @@ source("/Users/kbg/R_Functions/ibutton_BatchImport_14Oct2015.R")
     scale_x_datetime(date_breaks = "1 hour", labels = x.axis.labels, expand= c(0, 0)) +
     #scale_color_manual(values= c(treatment.color), name= "Treatment") +
     scale_color_manual(values= c(rep.color), name= "Replicate") +
-    scale_linetype_manual(values= c("dotted", "solid")) +
+    scale_linetype_manual(values= c("dotted", "solid"), name= treatment.legend) +
     theme_ibutton
   ggsave(last_plot(), filename = file.path(dir_out_fig, "PAM2014_temperature_plot_reps.pdf"), height= 6.4, width= 8, units= "in")
 
