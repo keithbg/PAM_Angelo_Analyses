@@ -82,7 +82,7 @@ source("/Users/kbg/R_Functions/ibutton_BatchImport_14Oct2015.R")
     scale_x_datetime(date_breaks = "1 hour", labels = x.axis.labels, expand= c(0, 0)) +
     #scale_color_manual(values= c(treatment.color), name= "Treatment") +
     scale_color_manual(values= c(rep.color), name= "Replicate") +
-    scale_linetype_manual(values= c("dotted", "solid"), name= treatment.legend) +
+    scale_linetype_manual(values= c("solid", "dashed"), name= treatment.legend) +
     theme_ibutton
   ggsave(last_plot(), filename = file.path(dir_out_fig, "PAM2014_temperature_plot_reps.pdf"), height= 6.4, width= 8, units= "in")
 

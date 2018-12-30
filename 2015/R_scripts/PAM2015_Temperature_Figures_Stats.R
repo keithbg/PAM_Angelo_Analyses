@@ -9,7 +9,6 @@
 #### Libraries #################################################################
 library(tidyverse)
 library(lubridate)
-library(stringr)
 library(ggplot2)
 library(scales)
 library(lme4)
@@ -92,7 +91,9 @@ plot(min.t ~ as.factor(Treatment), data= subset(pam.ib.stats, Site != "4"))
 
 
 ##### PLOTTING PARAMETERS ######################################################
-treatment.fill <- c("DodgerBlue", "firebrick2")
+treatment.order <- c("Thalweg", "Margin")
+treatment.labels <- c("Thalweg", "Margin")
+treatment.fill <- c("firebrick2", "DodgerBlue")
 site.facet.labels <- as_labeller(c(`1` = "Site 1", `2` = "Site 2", `3` = "Site 3", `4`= "Site 4"))
 facet.by.site <- facet_grid(Site~., labeller = labeller(Site= site.facet.labels))
 
@@ -111,6 +112,9 @@ theme_ibutton <- theme(panel.grid = element_blank(),
                         legend.position = "top",
                         axis.text.x = element_text(angle= 45, hjust= 1))
 
+
+
+
 #### MAKE PLOTS ################################################################
 
 temp.plot1 <- ggplot(data= pam.ib.s, aes(x= DateTimeRound,
@@ -123,9 +127,8 @@ temp.plot1 +
   labs(x="", y=expression('Temperature ('*degree*C*')')) +
   scale_y_continuous(limits= c(15, 33), labels= c("15", "20", "25", "30", "")) +
   scale_x_datetime(date_breaks = "1 day", labels = date_format("%b-%d"), expand= c(0, 0)) +
-  scale_fill_manual(values= treatment.fill) +
+  scale_fill_manual(values= treatment.fill, breaks= treatment.order, labels= treatment.labels) +
   facet.by.site +
   theme_ibutton
-ggsave(last_plot(), filename = file.path(dir_out_fig, "PAM2015_temperature_plot.pdf"), height= 6.4, width= 8, units= "in")
-
+ggsave(last_plot(), filename = file.path(dir_out_fig, "temperature_plot_PAM2015.pdf"), height= 6.4, width= 8, units= "in")
 

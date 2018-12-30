@@ -28,6 +28,8 @@ vel.df <- read_tsv(file.path(dir_input, "PAM2105_water_velocity_data.tsv")) %>%
 
 ##### PLOTTING PARAMETERS ######################################################
 yintercept <- geom_hline(yintercept = 0, size= 0.25)
+treatment.order <- c("Thal", "Marg")
+treatment.labels <- c("Thalweg", "Margin")
 treatment.fill <- c("white", "black")
 treatment.col <- c("white", "black")
 treatment.shapes <- c(21, 21)
@@ -55,22 +57,22 @@ vel.plot1 +
   geom_boxplot(aes()) +
   geom_point(aes(fill= Treatment, shape= Treatment), position= position_dodge(width= 0.5)) +
   x_axis_format +
-  scale_fill_manual(values= treatment.fill) +
-  scale_shape_manual(values= treatment.shapes) +
+  scale_fill_manual(values= treatment.fill, breaks= treatment.order, labels= treatment.labels) +
+  scale_shape_manual(values= treatment.shapes, breaks= treatment.order, labels= treatment.labels) +
   scale_color_manual(values= treatment.col) +
   theme_pam
 
 
-vel.plot2 <- ggplot(data= vel.df, aes(x= Treatment, y= velocity_ms * 100))
+vel.plot2 <- ggplot(data= vel.df, aes(x= rev(Treatment), y= velocity_ms * 100))
 
 vel.plot2 +
   yintercept +
-  geom_boxplot(aes()) +
+  geom_boxplot(aes(), outlier.color = "transparent") +
   geom_point(aes(fill= Treatment, shape= Treatment), position= position_jitter(width= 0.2), size= 3) +
-  labs(x= "Treatment", y= "Water velocity (cm/s)") +
-  scale_fill_manual(values= treatment.fill) +
-  scale_shape_manual(values= treatment.shapes) +
-  scale_x_discrete(labels= c("Margin", "Thalweg")) +
+  labs(x= "Treatment", y= expression(paste("Water velocity (cm ", s^-1, ")"))) +
+  scale_fill_manual(values= treatment.fill, breaks= treatment.order, labels= treatment.labels) +
+  scale_shape_manual(values= treatment.shapes, breaks= treatment.order, labels= treatment.labels) +
+  scale_x_discrete(breaks= c("Thal", "Marg"), labels= c("Margin", "Thalweg")) +
   theme_velocity
 ggsave(last_plot(), filename = file.path(dir_out_fig, "water_velocity_plot.pdf"), height= 6.4, width= 8, units= "in", device= cairo_pdf)
 

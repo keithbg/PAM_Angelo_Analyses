@@ -14,8 +14,8 @@ library(lubridate)
 
 
 #### FILE PATHS ################################################################
-dir_input <- file.path("/Users","kbg","Dropbox","PAM_Angelo","2015", "PAM_data")
-dir_out_fig <- file.path("/Users","kbg","Dropbox","PAM_Angelo","2015", "Figures_Keith_2015")
+dir_input <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "PAM_Angelo_Analyses", "2015", "PAM_data")
+dir_out_fig <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "PAM_Angelo_Analyses", "2015", "Figures")
 ################################################################################
 
 #### READ IN AND FORMAT DATA ##############################################################
@@ -128,8 +128,8 @@ reg.figs.trt <- reg.figs.site %>%
             se.Fo.trt = sd.Fo.trt / sqrt(n)) %>%
   ungroup() %>%
   mutate(Day= yday(Date) - yday(unique(Date)[1]),
-         ID= str_c(Algae, Treatment, sep= "."),
-         mean.ETRm.adjusted= ifelse(Treatment == "Thal", mean.ETRm.REG2.trt + diff(reg.figs.site.blanks$mean.ETRm.REG2), mean.ETRm.REG2.trt))
+         ID= str_c(Algae, Treatment, sep= "."))
+         #mean.ETRm.adjusted= ifelse(Treatment == "Thal", mean.ETRm.REG2.trt + diff(reg.figs.site.blanks$mean.ETRm.REG2), mean.ETRm.REG2.trt))
 
 
 
@@ -177,6 +177,8 @@ plot_lines <- geom_line(aes(group= ID, linetype= Treatment), position= position_
 yintercept <- geom_hline(yintercept = 0, size= 0.25)
 x_axis_format <- scale_x_date(breaks= seq.Date(as.Date("2015-06-09"), as.Date("2015-06-15"), by= 1),
                               labels=c("Jun-09", "Jun-10", "Jun-11", "", "", "", "Jun-15"))
+treatment.order <- c("Thal", "Marg")
+treatment.labels <- c("Thalweg", "Margin")
 treatment.fill <- c("white", "black")
 treatment.linetype <- c("dashed", "solid")
 treatment.shapes <- c(21, 21)
@@ -218,11 +220,11 @@ lc.trt.plot1 +
   geom_line(aes(linetype= Treatment), size= 0.25) +
   plot_errorbars +
   geom_point(aes(fill=Treatment, shape= Treatment), size = 1.5, color= "black") +
-  labs(x=expression(paste("PAR ",mu,"Mols ",m^{-2}," ", s^{-1} )), y="Mean relative electron transport rate ± se") +
+  labs(x=expression(paste("PAR (",mu,"Mols ",m^{-2}," ", s^{-1}, ")")), y=" rETR (± se)") +
   scale_x_continuous(limits= c(0, 4000)) +
-  scale_linetype_manual(values= treatment.linetype) +
-  scale_fill_manual(values= treatment.fill) +
-  scale_shape_manual(values= treatment.shapes) +
+  scale_linetype_manual(values= treatment.linetype, breaks= treatment.order, labels= treatment.labels) +
+  scale_fill_manual(values= treatment.fill, breaks= treatment.order, labels= treatment.labels) +
+  scale_shape_manual(values= treatment.shapes, breaks= treatment.order, labels= treatment.labels) +
   facet_grid(Algae~Date, labeller= labeller(Date= date.facet.labels, Algae= algae.facet.labels)) +
   theme_pam
 ggsave(last_plot(), filename = file.path(dir_out_fig, "light_curves_treatment_means.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
@@ -238,11 +240,11 @@ lc.site.plot1 +
   yintercept +
   geom_line(aes(linetype= Treatment), size= 0.25) +
   geom_point(aes(fill=Treatment, shape= Treatment), size = 1.5, color= "black") +
-  labs(x=expression(paste("PAR ",mu,"Mols ",m^{-2}," ", s^{-1} )), y="Mean relative electron transport rate ± se") +
+  labs(x=expression(paste("PAR ",mu,"Mols ",m^{-2}," ", s^{-1} )), y="rETR (± se)") +
   scale_x_continuous(limits= c(0, 4000)) +
-  scale_linetype_manual(values= treatment.linetype) +
-  scale_fill_manual(values= treatment.fill) +
-  scale_shape_manual(values= treatment.shapes) +
+  scale_linetype_manual(values= treatment.linetype, breaks= treatment.order, labels= treatment.labels) +
+  scale_fill_manual(values= treatment.fill, breaks= treatment.order, labels= treatment.labels) +
+  scale_shape_manual(values= treatment.shapes, breaks= treatment.order, labels= treatment.labels) +
   facet_grid(Algae~Date, labeller= labeller(Date= date.facet.labels, Algae= algae.facet.labels)) +
   theme_pam
 ggsave(last_plot(), filename = file.path(dir_out_fig, "light_curves_site_means.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
@@ -306,13 +308,13 @@ p.alpha.trt <- ggplot(data= reg.figs.trt, aes(x= Date,
 
 p.alpha.trt +
   yintercept +
-  plot_lines +
+#  plot_lines +
   plot_errorbars +
   plot_points +
   scale_y_continuous(limits= c(0, 0.23), breaks= seq(0, 0.2, by= 0.05), labels= c("0", "", "0.1", "", "0.2")) +
-  labs(x= "", y= bquote("Mean alpha ± se")) +
-  scale_fill_manual(values= treatment.fill) +
-  scale_shape_manual(values= treatment.shapes) +
+  labs(x= "", y= bquote("Alpha (± se)")) +
+  scale_fill_manual(values= treatment.fill, breaks= treatment.order, labels= treatment.labels) +
+  scale_shape_manual(values= treatment.shapes, breaks= treatment.order, labels= treatment.labels) +
   scale_linetype_manual(values= treatment.linetype) +
   x_axis_format +
   facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
@@ -321,7 +323,6 @@ ggsave(last_plot(), filename = file.path(dir_out_fig, "alphaREG2.pdf"), height= 
 
 
 ### ETR max
-mean.ETRm.adjusted
 
 p.ETRm.trt <- ggplot(data= reg.figs.trt, aes(x= Date,
                                                       y= mean.ETRm.REG2.trt,
@@ -340,13 +341,13 @@ p.ETRm.trt.adj <- ggplot(data= reg.figs.trt, aes(x= Date,
 #p.ETRm.trt.adj +
   p.ETRm.trt +
   yintercept +
-  plot_lines +
+  #plot_lines +
   plot_errorbars +
   plot_points +
   scale_y_continuous(limits= c(0, 175), breaks= seq(0, 175, by= 25), labels= c("0", "", "50", "", "100", "", "150", "")) +
-  labs(x= "", y= bquote("Mean ETRmax ± se")) +
-  scale_fill_manual(values= treatment.fill) +
-  scale_shape_manual(values= treatment.shapes) +
+  labs(x= "", y= bquote(rETR[max] ~ " (± se)")) +
+  scale_fill_manual(values= treatment.fill, breaks= treatment.order, labels= treatment.labels) +
+  scale_shape_manual(values= treatment.shapes, breaks= treatment.order, labels= treatment.labels) +
   scale_linetype_manual(values= treatment.linetype) +
   x_axis_format +
   facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
@@ -363,14 +364,13 @@ p.FvFm.trt <- ggplot(data= reg.figs.trt, aes(x= Date,
                                                group= ID))
 
 p.FvFm.trt +
-  yintercept +
-  plot_lines +
+  #plot_lines +
   plot_errorbars +
   plot_points +
   scale_y_continuous(limits= c(0.2, 0.62), breaks= seq(0, 0.6, by= 0.1), labels= c("0", "", "0.2", "", "0.4", "", "0.6")) +
-  labs(x= "", y= bquote("Mean Fv/Fm ± se")) +
-  scale_fill_manual(values= treatment.fill) +
-  scale_shape_manual(values= treatment.shapes) +
+  labs(x= "", y= bquote(F[v]/F[m] ~ " (± se)")) +
+  scale_fill_manual(values= treatment.fill, breaks= treatment.order, labels= treatment.labels) +
+  scale_shape_manual(values= treatment.shapes, breaks= treatment.order, labels= treatment.labels) +
   scale_linetype_manual(values= treatment.linetype) +
   x_axis_format +
   facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +

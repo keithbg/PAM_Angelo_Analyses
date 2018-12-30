@@ -4,13 +4,12 @@
 #### Libraries #################################################################
 library(tidyverse)
 library(lubridate)
-library(stringr)
 ################################################################################
 
 
 #### FILE PATHS ################################################################
-dir_input <- file.path("/Users","kbg","Dropbox","PAM_Angelo","2015", "PAM_data")
-dir_out <- file.path("/Users","kbg","Dropbox","PAM_Angelo","2015", "PAM_data")
+dir_input <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "PAM_Angelo_Analyses",  "2015", "PAM_data")
+dir_out <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "PAM_Angelo_Analyses", "2015", "PAM_data")
 ################################################################################
 
 

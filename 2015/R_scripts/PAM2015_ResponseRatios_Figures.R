@@ -14,8 +14,8 @@ library(grDevices)
 
 
 #### FILE PATHS ################################################################
-dir_input <- file.path("/Users","kbg","Dropbox","PAM_Angelo","2015", "PAM_data")
-dir_out_fig <- file.path("/Users","kbg","Dropbox","PAM_Angelo","2015", "Figures")
+dir_input <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "PAM_Angelo_Analyses", "2015", "PAM_data")
+dir_out_fig <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "PAM_Angelo_Analyses", "2015", "Figures")
 ################################################################################
 
 #### READ IN DATA ##############################################################
@@ -33,6 +33,8 @@ yintercept <- geom_hline(yintercept = 0, size= 0.25)
 x_axis_format <- scale_x_date(breaks= seq.Date(as.Date("2015-06-10"), as.Date("2015-06-15"), by= 1),
                               labels=c("Jun-10", "Jun-11", "", "", "", "Jun-15"))
 
+treatment.order <- c("Thal", "Marg")
+treatment.labels <- c("Thalweg", "Margin")
 treatment.fill <- c("white", "black")
 treatment.shapes <- c(21, 21)
 algae.facet.labels <- as_labeller(c(`Clad` = expression(italic("Cladophora")), `Oed` = expression(italic("Oedogonium")), `Peri` = "Periphyton"))
@@ -79,9 +81,9 @@ p.fv.fm +
   plot_points +
   #scale_y_continuous(limits= c(-0.4, 0.15), breaks= seq(-0.4, 0.1, by= 0.1)) +
   scale_y_continuous(limits= c(-0.4, 0.15), breaks= seq(-0.4, 0.1, by= 0.1), labels= c("-0.4", "", "-0.2", "", "0", "")) +
-  labs(x= "", y= bquote("Mean" ~ F[v]/F[m] ~ "± se")) +
-  scale_fill_manual(values= treatment.fill) +
-  scale_shape_manual(values= treatment.shapes) +
+  labs(x= "", y= bquote(F[v]/F[m] ~ " response ratio (± se)")) +
+  scale_fill_manual(values= treatment.fill, breaks= treatment.order, labels= treatment.labels) +
+  scale_shape_manual(values= treatment.shapes, breaks= treatment.order, labels= treatment.labels) +
   x_axis_format +
   facet.by.algae +
   theme_rr
@@ -100,9 +102,9 @@ p.alpha.reg2 +
   plot_errorbars +
   plot_points +
   scale_y_continuous(limits= c(-0.62, 0.3), breaks= seq(-0.6, 0.3, by= 0.1), labels= c("-0.6", "", "-0.4", "", "-0.2", "", "0", "", "0.2", "")) +
-  labs(x= "", y= bquote("Mean alpha ± se")) +
-  scale_fill_manual(values= treatment.fill) +
-  scale_shape_manual(values= treatment.shapes) +
+  labs(x= "", y= bquote("Alpha response ratio (± se)")) +
+  scale_fill_manual(values= treatment.fill, breaks= treatment.order, labels= treatment.labels) +
+  scale_shape_manual(values= treatment.shapes, breaks= treatment.order, labels= treatment.labels) +
   x_axis_format +
   facet.by.algae +
   theme_rr
@@ -121,9 +123,9 @@ p.ETRmax.reg2 +
   plot_errorbars +
   plot_points +
   scale_y_continuous(limits= c(-0.35, 0.4), breaks= seq(-0.3, 0.4, by= 0.1), labels= c("", "-0.2", "", "0", "",  "0.2", "", "0.4")) +
-  labs(x= "", y= bquote("Mean" ~ ETR[max] ~ "± se")) +
-  scale_fill_manual(values= treatment.fill) +
-  scale_shape_manual(values= treatment.shapes) +
+  labs(x= "", y= bquote(rETR[max] ~ " response ratio (± se)")) +
+  scale_fill_manual(values= treatment.fill, breaks= treatment.order, labels= treatment.labels) +
+  scale_shape_manual(values= treatment.shapes, breaks= treatment.order, labels= treatment.labels) +
   x_axis_format +
   facet.by.algae +
   theme_rr +
