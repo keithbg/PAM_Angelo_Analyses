@@ -26,7 +26,11 @@ dir_out_table <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo
                 rename(Treatment = Location) %>%
                 mutate(Rep= str_sub(.$uniqueID, start= -1),
                        Algae= ifelse(Algae == "Cyano_Spires", "Ana_Spires",
-                                     ifelse(Algae == "Phorm", "Microcoleus", Algae)))
+                                     ifelse(Algae == "Phorm", "Microcoleus", Algae))) %>% 
+                mutate(Algae= as.factor(Algae),
+                       Treatment= as.factor(Treatment))
+  rr.stats$Treatment <- factor(rr.stats$Treatment, levels= levels(rr.stats$Treatment)[c(2, 1)])
+
 
   param.stats <- read_tsv(file.path(dir_input, "PAM2014_clean_REG2_response_ratios.tsv")) %>%
                     filter(Algae != "Blank") %>%
@@ -35,7 +39,8 @@ dir_out_table <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo
                     mutate(Rep= str_sub(.$uniqueID, start= -1),
                            Algae= ifelse(Algae == "Cyano_Spires", "Ana_Spires",
                                          ifelse(Algae == "Phorm", "Microcoleus", Algae)))
-
+  param.stats$Treatment <- factor(param.stats$Treatment, levels= levels(param.stats$Treatment)[c(2, 1)])
+  
   ## Lump algae into 3 functional categories:
   ## Chlorophytes= Clad_R and Clad_Y
   ## Motile cyanos= Anabaena and Microcoleus
@@ -49,7 +54,8 @@ dir_out_table <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo
                        mutate(Rep= str_sub(.$uniqueID, start= -1),
                               func_group= ifelse(Algae == "Clad_R" | Algae == "Clad_Y", "Chlorophyte",
                                                  ifelse(Algae == "Cyano_Spires" | Algae == "Phorm", "Cyano_motile", "Cyano_nonmotile")))
-
+  func.group.stats$Treatment <- factor(func.group.stats$Treatment, levels= levels(func.group.stats$Treatment)[c(2, 1)])
+  
 #### STATISTICAL MODEL #########################################################
 # Treatment = fixed effect = p = 2 (Benthic and Floating)
 # Algae = fixed effect = Algae = j = 3 (Clad_Y, Clad_R, Anabaena Spires, Nostoc, Rivularia, Microcoleus)
@@ -67,18 +73,6 @@ fit.algae.alpha.rr <- lm(Alpha.rr ~ Treatment*Algae, data= rr.stats)
 summary(fit.algae.alpha.rr)
 anova(fit.algae.alpha.rr)
 
-## Calculating paired t-test by hand on Clad_R alpha to confirm R t.test function
-## This by-hand calculation matches the output from t.test
-  ## Clad_R response ratios for Alpha
-  # ben <- c(0.126, -0.258, -0.232)
-  # flo <- c(-0.324, -0.513, -0.446)
-  # n <- 3
-  #
-  # mean.difference <- mean(ben - flo)
-  # sd.difference <- sd(ben - flo)
-  #
-  # t.value <- mean.difference / (sd.difference / sqrt(n))
-  # p.value <- (1 - pt(t.value, df= 2))*2
 
 
 fit.algae.ETRm.rr <- lm(ETRm.rr ~ Treatment*Algae, data= rr.stats)
@@ -91,43 +85,118 @@ summary(fit.algae.FvFm.rr)
 anova(fit.algae.FvFm.rr)
 
 
-pvalues.rr <- as.data.frame(matrix(round(c(anova(fit.algae.alpha.rr)[ ,"Pr(>F)"], anova(fit.algae.ETRm.rr)[ ,"Pr(>F)"], anova(fit.algae.FvFm.rr)[ ,"Pr(>F)"]), 5),
-                                                nrow= 4,
-                                                dimnames= list(c("Treatment", "Algae", "Treatment:Algae", "NA"), c("Alpha", "ETRm", "FvFm"))))[-4, ]
-
 
 
 # CALCULATED ON ACTUAL PARAMETER VALUES
 # DAY 0
-  # Tests: Algae, Treatment, and interaction
-  fit.algae.alpha.d0 <- lm(Alpha.d0 ~ Algae*Treatment, data= param.stats)
-  summary(fit.algae.alpha.d0)
-  anova(fit.algae.alpha.d0)
+# Tests: Algae, Treatment, and interaction
+fit.algae.alpha.d0 <- lm(Alpha.d0 ~ Algae*Treatment, data= param.stats)
+summary(fit.algae.alpha.d0)
+anova(fit.algae.alpha.d0)
 
-  fit.algae.ETRm.d0 <- lm(ETRm.d0 ~ Algae*Treatment, data= param.stats)
-  summary(fit.algae.ETRm.d0)
-  anova(fit.algae.ETRm.d0)
+fit.algae.ETRm.d0 <- lm(ETRm.d0 ~ Algae*Treatment, data= param.stats)
+summary(fit.algae.ETRm.d0)
+anova(fit.algae.ETRm.d0)
 
-  fit.algae.FvFm.d0 <- lm(FvFm.d0 ~ Algae*Treatment, data= param.stats)
-  summary(fit.algae.FvFm.d0)
-  anova(fit.algae.FvFm.d0)
+fit.algae.FvFm.d0 <- lm(FvFm.d0 ~ Algae*Treatment, data= param.stats)
+summary(fit.algae.FvFm.d0)
+anova(fit.algae.FvFm.d0)
 
 # DAY 1
-  # Tests: Algae, Treatment, and interaction
-  fit.algae.alpha.d1 <- lm(Alpha ~ Algae*Treatment, data= param.stats)
-  summary(fit.algae.alpha.d1)
-  anova(fit.algae.alpha.d1)
+# Tests: Algae, Treatment, and interaction
+fit.algae.alpha.d1 <- lm(Alpha ~ Algae*Treatment, data= param.stats)
+summary(fit.algae.alpha.d1)
+anova(fit.algae.alpha.d1)
 
-  fit.algae.ETRm.d1 <- lm(ETRm ~ Algae*Treatment, data= param.stats)
-  summary(fit.algae.ETRm.d1)
-  anova(fit.algae.ETRm.d1)
+fit.algae.ETRm.d1 <- lm(ETRm ~ Algae*Treatment, data= param.stats)
+summary(fit.algae.ETRm.d1)
+anova(fit.algae.ETRm.d1)
 
-  fit.algae.FvFm.d1 <- lm(FvFm ~ Algae*Treatment, data= param.stats)
-  summary(fit.algae.FvFm.d1)
-  anova(fit.algae.FvFm.d1)
+fit.algae.FvFm.d1 <- lm(FvFm ~ Algae*Treatment, data= param.stats)
+summary(fit.algae.FvFm.d1)
+anova(fit.algae.FvFm.d1)
 
 
+#### PLANNED CONTRASTS ##################################################
 
+# There are 6 factor levels in the variable "Algae", so we can make 5 orthogonal contrasts
+# Orthogonal means you cannot make the same contrast multiple times, 
+# nor can you make an implicit contrast that is the result of prior contrasts. 
+# Therefore, there are k-1 orthogonal contrasts where, k is the number of levels in a variable
+
+# Degrees of freedom for T-test are df = N-k
+# N = number of samples included in test = 36
+# k = number of comparisons in our model = 11
+# df = 36 - 11 = 24
+
+# We will contrast:
+# c1: Cladophora vs. all the cyanobacteria
+# c2: Motile cyanos (Anabaena & Microcoleus) vs. non-motile cyanos (Nostoc & Rivularia)
+# c3: Yellow Cladophora vs. Red Cladophora
+# c4: Anabaena vs. Microcoleus
+# c5: Nostoc vs. Rivularia
+
+# Make new data frame to assign new contrasts for the Algae variable
+pc.stats <- rr.stats
+contrasts(pc.stats$Algae)
+levels(pc.stats$Algae)
+
+
+# Create new contrast matrix
+clad.cyano.contrasts <- cbind(c(1, -2, -2, 1, 1, 1), # Cladophora vs. all cyanos
+                              c(-1, 0, 0, -1, 1, 1), # Motile vs. non motile
+                              c(0, 1, -1, 0, 0, 0), # Clad_R vs. Clad_Y
+                              c(1, 0, 0, -1, 0, 0), # Anabaens vs. Microcoleus
+                              c(0, 0, 0, 0, 1, -1)) # Nostoc vs. Rivularia
+colnames(clad.cyano.contrasts) <- c("Clad.v.Cyano", "Motile.v.NonMotile", "Clad", "Motile", "Nonmotile")
+
+
+# Check to make sure product of columns sums to zero, which means that comparisons are orthogonal
+# sum(clad.cyano.contrasts[, 1] * clad.cyano.contrasts[, 2])
+
+# Assign the contrast matrix
+contrasts(pc.stats$Algae) <- clad.cyano.contrasts
+
+# Run statistical models with the new contrasts
+pc.alpha.lm <- lm(Alpha.rr ~ Treatment*Algae, data= pc.stats)
+pc.alpha.sum <- summary(pc.alpha.lm)
+summary(fit.algae.alpha.rr) # Can check results with the default treatment contrast matrix
+
+# ANOVA tables between default and new contrast give same results, 
+# so our new contrast matrix is performing as expected
+# anova(pc.alpha.lm)
+# anova(fit.algae.alpha.rr)
+
+pc.fvfm.lm <- lm(FvFm.rr ~ Treatment*Algae, data= pc.stats)
+pc.fvfm.sum <- summary(pc.fvfm.lm)
+
+pc.ETRm.lm <- lm(ETRm.rr ~ Treatment*Algae, data= pc.stats)
+pc.ETRm.sum <- summary(pc.ETRm.lm)
+#anova(pc.ETRm.lm)
+
+
+## Manually calculate means of different Alpha.rr contrasts to check the planned contrasts results
+
+pc.stats$c1 <- ifelse(pc.stats$Algae == "Clad_Y" | pc.stats$Algae == "Clad_R", "Clad", "Cyano")
+pc.stats$c2 <- ifelse(pc.stats$Algae == "Ana_Spires" | pc.stats$Algae == "Microcoleus", 
+                      "Motile", pc.stats$c1)
+
+
+treatment.means <- tapply(pc.stats$Alpha.rr, pc.stats$Treatment, mean)
+algae.means <- tapply(pc.stats$Alpha.rr, list(pc.stats$Treatment, pc.stats$Algae), mean)
+c1.means <- tapply(pc.stats$Alpha.rr, list(pc.stats$Treatment, pc.stats$c1), mean)
+c2.means <- tapply(pc.stats$Alpha.rr, list(pc.stats$Treatment, pc.stats$c2), mean)
+
+
+## C1 Interpretation
+## The difference of mean cyanobacterial response from the overall mean
+-(treatment.means[1] - c1.means[1, 2])
+pc.alpha.sum$coefficients[3, 1] # Manual calculation matches statistical output
+
+## C2 Interpretation
+## The difference between the Motile and Non-motile cyano means, divided by 2
+(c2.means[1, 2] - c2.means[1, 3]) / 2
+pc.alpha.sum$coefficients[4, 1] # Manual calculation matches statistical output
 
 
 #### T-TESTS ############################################################
@@ -137,6 +206,21 @@ pvalues.rr <- as.data.frame(matrix(round(c(anova(fit.algae.alpha.rr)[ ,"Pr(>F)"]
 
 ## degrees of freedom: Unpaired= 3 + 3 - 2 = 4
 ## degrees of freedom: Paired= 3 - 1 = 2
+
+
+## Calculating paired t-test by hand on Clad_R alpha to confirm R t.test function
+## This by-hand calculation matches the output from t.test
+## Clad_R response ratios for Alpha
+# ben <- c(0.126, -0.258, -0.232)
+# flo <- c(-0.324, -0.513, -0.446)
+# n <- 3
+#
+# mean.difference <- mean(ben - flo)
+# sd.difference <- sd(ben - flo)
+#
+# t.value <- mean.difference / (sd.difference / sqrt(n))
+# p.value <- (1 - pt(t.value, df= 2))*2
+
 
 ## Initialize data frame
 
@@ -218,6 +302,6 @@ for(param in c("Alpha.rr", "ETRm.rr", "FvFm.rr")){
   }
 }
 
-write_tsv(t.test.func.group.output, path= file.path(dir_out_table, "t_test_output_func_group_2014.tsv"))
+#write_tsv(t.test.func.group.output, path= file.path(dir_out_table, "t_test_output_func_group_2014.tsv"))
 
 
