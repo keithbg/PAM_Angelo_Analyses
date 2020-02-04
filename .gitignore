@@ -1,0 +1,12 @@
+# Files for git to ignore
+PAM_Angelo_Analyses.Rproj
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+Maps
+2014/Figures
+2014/Retrieval_Photos_24Jul2014
+2014/PAM_data/Dry_Mass_PAM experiment2014_KBG.xlsx
+2015/Figures
+

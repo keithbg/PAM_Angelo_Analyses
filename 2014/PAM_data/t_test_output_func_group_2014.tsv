@@ -1,0 +1,10 @@
+parameter	group	test	t_value	df	p_value
+Alpha	Chlorophyte	paired	4.37	5	0.0073
+Alpha	Cyano_motile	paired	3.66	5	0.0146
+Alpha	Cyano_nonmotile	paired	-1.05	5	0.3427
+ETRm	Chlorophyte	paired	3.56	5	0.0163
+ETRm	Cyano_motile	paired	4.98	5	0.0042
+ETRm	Cyano_nonmotile	paired	0.19	5	0.8594
+FvFm	Chlorophyte	paired	2.01	5	0.1008
+FvFm	Cyano_motile	paired	1.74	5	0.1427
+FvFm	Cyano_nonmotile	paired	-0.45	5	0.6744

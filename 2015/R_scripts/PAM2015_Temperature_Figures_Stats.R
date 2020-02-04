@@ -12,14 +12,15 @@ library(lubridate)
 library(ggplot2)
 library(scales)
 library(lme4)
-source("/Users/kbg/R_Functions/ibutton_BatchImport_14Oct2015.R")
+library(lmerTest)
+lsource("/Users/kbg/R_Functions/ibutton_BatchImport_14Oct2015.R")
 ################################################################################
 
 
 #### FILE PATHS ################################################################
-dir_input <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "PAM_Angelo_Analyses", "2015", "PAM_data")
-dir_out_fig <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "PAM_Angelo_Analyses", "2015", "Figures")
-dir_out_table <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "PAM_Angelo_Analyses", "2015", "PAM_data")
+dir_input <- file.path("2015", "PAM_data")
+dir_out_fig <- file.path("2015", "Figures")
+dir_out_table <- file.path("2015", "PAM_data")
 ################################################################################
 
 #### READ IN AND FORMAT DATA ###################################################
@@ -51,6 +52,7 @@ pam.ib.s <- pam.ib %>%
                sd.t = sd(Value),
                se.t = sd.t/sqrt(N))
 
+
 ## Summarize for statistics
 pam.ib.stats <- pam.ib %>%
   filter(Site != "cooler") %>%
@@ -67,6 +69,40 @@ pam.ib.stats <- pam.ib %>%
 #write_tsv(pam.ib.stats, path= file.path(dir_out_table, "PAM2015_temperature_daily_summary.tsv"))
 
 
+## Calculate daily min, max, and mean between all 4 sites
+pam.ib.stats %>% 
+  group_by(Treatment) %>% 
+  summarize(
+    N = length(min.t),
+    mean.min.t = mean(min.t),
+    min.min.t = min(min.t),
+    max.min.t = max(min.t),
+    sd.min.t = sd(min.t)
+  )
+
+pam.ib.stats %>% 
+  group_by(Treatment) %>% 
+  summarize(
+    N = length(max.t),
+    mean.max.t = mean(max.t),
+    max.max.t = max(max.t),
+    max.max.t = max(max.t),
+    sd.max.t = sd(max.t)
+  )
+
+pam.ib.stats %>% 
+  group_by(Treatment) %>% 
+  summarize(
+    N = length(max.t),
+    mean.mean.t = mean(mean.t),
+    max.mean.t = max(mean.t),
+    max.mean.t = max(mean.t),
+    sd.mean.t = sd(mean.t)
+  )
+
+
+
+
 #### STATISTICS ################################################################
 
 ## Removed site 4 because its temperature behaved differently than the other 3 sites
@@ -76,6 +112,7 @@ fit.max.t <- lmer(max.t ~ Treatment + (1|Site), data= subset(pam.ib.stats, Site 
 anova(fit.max.t)
 
 fit.mean.t <- lmer(mean.t ~ Treatment + (1|Site), data= subset(pam.ib.stats, Site != "4"))
+#fit.mean.t <- lmer(mean.t ~ Treatment + (1|Site), data= pam.ib.stats) # check for significance if including Site 4
 summary(fit.mean.t)
 anova(fit.mean.t)
 

@@ -11,11 +11,12 @@
 
 #### LIBRARIES #################################################################
 library(tidyverse)
+library(lsmeans)
 ################################################################################
 
 #### FILE PATHS ################################################################
-dir_input <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "PAM_data")
-dir_out_table <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "PAM_data")
+dir_input <- file.path("2014", "PAM_data")
+dir_out_table <- file.path("2014", "PAM_data")
 ################################################################################
 
 
@@ -123,6 +124,9 @@ anova(fit.algae.FvFm.d1)
 # Orthogonal means you cannot make the same contrast multiple times, 
 # nor can you make an implicit contrast that is the result of prior contrasts. 
 # Therefore, there are k-1 orthogonal contrasts where, k is the number of levels in a variable
+# Constraints on contrast matrix to ensure orthogonality
+  # 1) The sum of values within a contrast must = zero
+  # 2) The sumn of the products of any two columns in the contrast matrix must = zero
 
 # Degrees of freedom for T-test are df = N-k
 # N = number of samples included in test = 36
@@ -136,19 +140,49 @@ anova(fit.algae.FvFm.d1)
 # c4: Anabaena vs. Microcoleus
 # c5: Nostoc vs. Rivularia
 
+
+
 # Make new data frame to assign new contrasts for the Algae variable
 pc.stats <- rr.stats
 contrasts(pc.stats$Algae)
 levels(pc.stats$Algae)
 
-
 # Create new contrast matrix
 clad.cyano.contrasts <- cbind(c(1, -2, -2, 1, 1, 1), # Cladophora vs. all cyanos
                               c(-1, 0, 0, -1, 1, 1), # Motile vs. non motile
                               c(0, 1, -1, 0, 0, 0), # Clad_R vs. Clad_Y
-                              c(1, 0, 0, -1, 0, 0), # Anabaens vs. Microcoleus
+                              c(1, 0, 0, -1, 0, 0), # Anabaena vs. Microcoleus
                               c(0, 0, 0, 0, 1, -1)) # Nostoc vs. Rivularia
-colnames(clad.cyano.contrasts) <- c("Clad.v.Cyano", "Motile.v.NonMotile", "Clad", "Motile", "Nonmotile")
+
+
+colnames(clad.cyano.contrasts) <- c("Clad.v.Cyano", "Motile.v.NonMotile", "CladR.v.CladY", "Ana.v.Micro", "Nostoc.v.Riv")
+aov.contrast.names <- list(Algae=list("Clad.v.Cyano"=1, "Motile.v.NonMotile" = 2, "CladR.v.CladY"=3, "Ana.v.Micro"=4, "Nostoc.v.Riv"=5))
+
+# 
+# pc.stats %>% 
+#   group_by(Algae) %>% 
+#   summarize(mean(Alpha.rr))
+# 
+# mean(filter(pc.stats, Treatment == "Floating")$Alpha.rr)
+# 
+# out <- lm(Alpha.rr ~ Algae * Treatment, data= pc.stats)
+# summary(out)
+# summary.aov(out, split=list(Algae=list("Clad.v.Cyano"=1, "Motile.v.NonMotile" = 2, "CladR.v.CladY"=3, "Ana.v.Micro"=4, "Nostoc.v.Riv"=5))) 
+# 
+# 
+# 
+# sout <- summary(lm(Alpha.rr ~ Algae, data= pc.stats))
+# 
+# cfs <- coef(sout)[, 1]
+# 
+# cfs[1] + sum(cfs[-1]*clad.cyano.contrasts[6, ])
+# 
+# 
+# summary.aov(lm(Alpha.rr ~ Algae, data= pc.stats))
+# 
+# 
+# 
+# summary.aov(model1, split=list(animal=list("Canines vs. Felines"=1, "Cougars vs House Cats" = 2, "Wolves vs Dogs"=3))) 
 
 
 # Check to make sure product of columns sums to zero, which means that comparisons are orthogonal
@@ -160,6 +194,9 @@ contrasts(pc.stats$Algae) <- clad.cyano.contrasts
 # Run statistical models with the new contrasts
 pc.alpha.lm <- lm(Alpha.rr ~ Treatment*Algae, data= pc.stats)
 pc.alpha.sum <- summary(pc.alpha.lm)
+summary.aov(pc.alpha.lm, split= aov.contrast.names)
+
+
 summary(fit.algae.alpha.rr) # Can check results with the default treatment contrast matrix
 
 # ANOVA tables between default and new contrast give same results, 
@@ -169,9 +206,12 @@ summary(fit.algae.alpha.rr) # Can check results with the default treatment contr
 
 pc.fvfm.lm <- lm(FvFm.rr ~ Treatment*Algae, data= pc.stats)
 pc.fvfm.sum <- summary(pc.fvfm.lm)
+summary.aov(pc.fvfm.lm, split= aov.contrast.names)
 
 pc.ETRm.lm <- lm(ETRm.rr ~ Treatment*Algae, data= pc.stats)
 pc.ETRm.sum <- summary(pc.ETRm.lm)
+summary.aov(pc.ETRm.lm, split= aov.contrast.names)
+
 #anova(pc.ETRm.lm)
 
 
@@ -285,11 +325,13 @@ t.test.func.group.output <- data.frame(parameter= as.character(NA),
 
 ## Loop over each functional type and parameter, save t and p values in the data frame
 count <- 1
+param= "Alpha.rr"
 for(param in c("Alpha.rr", "ETRm.rr", "FvFm.rr")){
   for(group in unique(func.group.stats$func_group)){
     output.paired <- func.group.stats %>%
       gather(parameter, value, Alpha.rr:FvFm.rr) %>%
-      filter(func_group == group, parameter== param) %>%
+      #filter(func_group == group, parameter== param) %>%
+      filter(parameter== param) %>%
       arrange(Rep) %>%
       t.test(value ~ Treatment,
              paired= TRUE,
@@ -305,3 +347,10 @@ for(param in c("Alpha.rr", "ETRm.rr", "FvFm.rr")){
 #write_tsv(t.test.func.group.output, path= file.path(dir_out_table, "t_test_output_func_group_2014.tsv"))
 
 
+new.df <- func.group.stats %>%
+  gather(parameter, value, Alpha.rr:FvFm.rr) %>%
+  #filter(func_group == group, parameter== param) %>%
+  filter(parameter== param) %>%
+  arrange(Rep)
+
+summary(lm(param ~ func_group, data= new.df))
