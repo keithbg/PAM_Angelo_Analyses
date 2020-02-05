@@ -13,7 +13,8 @@ library(ggplot2)
 library(scales)
 library(lme4)
 library(lmerTest)
-lsource("/Users/kbg/R_Functions/ibutton_BatchImport_14Oct2015.R")
+library(lemon)
+source("/Users/kbg/R_Functions/ibutton_BatchImport_14Oct2015.R")
 ################################################################################
 
 
@@ -108,8 +109,20 @@ pam.ib.stats %>%
 ## Removed site 4 because its temperature behaved differently than the other 3 sites
 ## Site 4 had clearer patterns
 
+fit.mean.thalweg <- lm(mean.t ~ Site, data= filter(pam.ib.stats, Treatment == "Thalweg"))
+summary(fit.mean.thalweg)
+anova(fit.mean.thalweg)
+TukeyHSD(aov(mean.t ~ Site, data= filter(pam.ib.stats, Treatment == "Thalweg")))
+
+
+fit.mean.margin <- lm(mean.t ~ Site, data= filter(pam.ib.stats, Treatment == "Margin"))
+summary(fit.mean.margin)
+anova(fit.mean.margin)
+TukeyHSD(aov(mean.t ~ Site, data= filter(pam.ib.stats, Treatment == "Margin")))
+
 fit.max.t <- lmer(max.t ~ Treatment + (1|Site), data= subset(pam.ib.stats, Site != "4"))
-anova(fit.max.t)
+#fit.max.t <- lmer(max.t ~ Treatment + (1|Site), data= pam.ib.stats)
+summary(fit.max.t)
 
 fit.mean.t <- lmer(mean.t ~ Treatment + (1|Site), data= subset(pam.ib.stats, Site != "4"))
 #fit.mean.t <- lmer(mean.t ~ Treatment + (1|Site), data= pam.ib.stats) # check for significance if including Site 4
@@ -135,6 +148,10 @@ site.facet.labels <- as_labeller(c(`1` = "Site 1", `2` = "Site 2", `3` = "Site 3
 facet.by.site <- facet_grid(Site~., labeller = labeller(Site= site.facet.labels))
 
 ## ggplot themes
+# theme_freshSci
+source(file.path("/Users", "kbg", "Dropbox", "PAM_Angelo","PAM_Angelo_Analyses", "ggplot_themes.R"))
+
+
 theme_ibutton <- theme(panel.grid = element_blank(),
                         plot.margin = unit(c(1, 1, 1, 1), "cm"),
                         text = element_text(size= 14),
@@ -165,7 +182,17 @@ temp.plot1 +
   scale_y_continuous(limits= c(15, 33), labels= c("15", "20", "25", "30", "")) +
   scale_x_datetime(date_breaks = "1 day", labels = date_format("%b-%d"), expand= c(0, 0)) +
   scale_fill_manual(values= treatment.fill, breaks= treatment.order, labels= treatment.labels) +
-  facet.by.site +
-  theme_ibutton
-ggsave(last_plot(), filename = file.path(dir_out_fig, "temperature_plot_PAM2015.pdf"), height= 6.4, width= 8, units= "in")
+  #facet.by.site +
+  facet_rep_wrap(~Site, ncol= 1, labeller = labeller(Site= site.facet.labels)) +
+  theme_freshSci +
+  theme(legend.position = "top",
+        legend.box.margin = margin(0, 0, 0, 0, unit= "cm"),
+        legend.box.spacing = unit(0, "cm"),
+        legend.key.size = unit(0.25, "cm"),
+        axis.title.x = element_blank())
+
+  
+  setwd("/Users/kbg/Dropbox/PAM_Angelo/PAM_Angelo_Analyses")
+#ggsave(last_plot(), filename = file.path(dir_out_fig, "temperature_plot_PAM2015.pdf"), height= 6.4, width= 8, units= "in")
+ggsave(last_plot(), filename = file.path(dir_out_fig, "temperature_plot_PAM2015.eps"), height= 12, width= 8.4, units= "cm", device= cairo_ps)
 

@@ -9,6 +9,7 @@
 library(tidyverse)
 library(lubridate)
 library(ggplot2)
+library(lemon)
 ################################################################################
 
 
@@ -27,6 +28,9 @@ vel.df <- read_tsv(file.path(dir_input, "PAM2105_water_velocity_data.tsv")) %>%
 
 
 ##### PLOTTING PARAMETERS ######################################################
+# theme_freshSci
+source(file.path("/Users", "kbg", "Dropbox", "PAM_Angelo","PAM_Angelo_Analyses", "ggplot_themes.R"))
+
 yintercept <- geom_hline(yintercept = 0, size= 0.25)
 treatment.order <- c("Thal", "Marg")
 treatment.labels <- c("Thalweg", "Margin")
@@ -34,33 +38,19 @@ treatment.fill <- c("white", "black")
 treatment.col <- c("white", "black")
 treatment.shapes <- c(21, 21)
 
-## ggplot themes
-theme_velocity <- theme(panel.grid = element_blank(),
-                   plot.margin = unit(c(1, 1, 1, 1), "cm"),
-                   text = element_text(size= 14),
-                   plot.background = element_rect(fill = "transparent"), # bg of the plot
-                   panel.background = element_rect(fill= "transparent", color="black"),
-                   axis.text = element_text(colour="black"),
-                   axis.title.x = element_text(vjust = -0.75),
-                   axis.title.y = element_text(vjust = 1.5),
-                   legend.background = element_rect(size=0.25, color="black", fill= "transparent"),
-                   legend.key = element_blank(),
-                   strip.background=element_rect(fill="transparent", color="transparent"),
-                   legend.position = "top")
-
 
 #### MAKE PLOTS ################################################################
 
-vel.plot1 <- ggplot(data= vel.df, aes(x= Date, y= velocity_ms * 100, group= interaction(Treatment, Date)))
-
-vel.plot1 +
-  geom_boxplot(aes()) +
-  geom_point(aes(fill= Treatment, shape= Treatment), position= position_dodge(width= 0.5)) +
-  x_axis_format +
-  scale_fill_manual(values= treatment.fill, breaks= treatment.order, labels= treatment.labels) +
-  scale_shape_manual(values= treatment.shapes, breaks= treatment.order, labels= treatment.labels) +
-  scale_color_manual(values= treatment.col) +
-  theme_pam
+# vel.plot1 <- ggplot(data= vel.df, aes(x= Date, y= velocity_ms * 100, group= interaction(Treatment, Date)))
+# 
+# vel.plot1 +
+#   geom_boxplot(aes()) +
+#   geom_point(aes(fill= Treatment, shape= Treatment), position= position_dodge(width= 0.5)) +
+#   x_axis_format +
+#   scale_fill_manual(values= treatment.fill, breaks= treatment.order, labels= treatment.labels) +
+#   scale_shape_manual(values= treatment.shapes, breaks= treatment.order, labels= treatment.labels) +
+#   scale_color_manual(values= treatment.col) +
+#   theme_pam
 
 
 vel.plot2 <- ggplot(data= vel.df, aes(x= rev(Treatment), y= velocity_ms * 100))
@@ -68,13 +58,16 @@ vel.plot2 <- ggplot(data= vel.df, aes(x= rev(Treatment), y= velocity_ms * 100))
 vel.plot2 +
   yintercept +
   geom_boxplot(aes(), outlier.color = "transparent") +
-  geom_point(aes(fill= Treatment, shape= Treatment), position= position_jitter(width= 0.2), size= 3) +
+  geom_point(aes(fill= Treatment, shape= Treatment), position= position_jitter(width= 0.2), size= 1) +
   labs(x= "Treatment", y= expression(paste("Water velocity (cm ", s^-1, ")"))) +
-  scale_fill_manual(values= treatment.fill, breaks= treatment.order, labels= treatment.labels) +
-  scale_shape_manual(values= treatment.shapes, breaks= treatment.order, labels= treatment.labels) +
+  scale_fill_manual(values= treatment.fill, breaks= treatment.order, labels= treatment.labels, guide= FALSE) +
+  scale_shape_manual(values= treatment.shapes, breaks= treatment.order, labels= treatment.labels, guide= FALSE) +
   scale_x_discrete(breaks= c("Thal", "Marg"), labels= c("Margin", "Thalweg")) +
-  theme_velocity
-ggsave(last_plot(), filename = file.path(dir_out_fig, "water_velocity_plot.pdf"), height= 6.4, width= 8, units= "in", device= cairo_pdf)
+  scale_y_continuous(expand= c(0.02, 0)) +
+  theme_freshSci
+  
+#ggsave(last_plot(), filename = file.path(dir_out_fig, "water_velocity_plot.pdf"), height= 6.4, width= 8, units= "in", device= cairo_pdf)
+ggsave(last_plot(), filename = file.path(dir_out_fig, "water_velocity_plot.eps"), height= 8.4, width= 8.4, units= "cm")
 
 
 
