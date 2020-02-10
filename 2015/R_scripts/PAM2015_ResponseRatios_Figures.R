@@ -43,6 +43,10 @@ facet.by.algae <- facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labe
 
 
 ## ggplot theme for response ratio plots
+# theme_freshSci
+source(file.path("/Users", "kbg", "Dropbox", "PAM_Angelo","PAM_Angelo_Analyses", "ggplot_themes.R"))
+
+
 theme_rr <- theme(panel.grid = element_blank(),
                    plot.margin = unit(c(1, 1, 1, 1), "cm"),
                    text = element_text(size= 14),
@@ -75,7 +79,7 @@ p.fv.fm <- ggplot(data= rr.figs, aes(x= Date,
                                         ymin= mean.rr.Fv.Fm - se.rr.Fv.Fm,
                                         group= ID))
 
-p.fv.fm +
+fvfm.rr <- p.fv.fm +
   yintercept +
   plot_errorbars +
   plot_points +
@@ -86,8 +90,10 @@ p.fv.fm +
   scale_shape_manual(values= treatment.shapes, breaks= treatment.order, labels= treatment.labels) +
   x_axis_format +
   facet.by.algae +
-  theme_rr
-ggsave(last_plot(), filename = file.path(dir_out_fig, "FvFm_rr.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
+ # theme_rr +
+  theme_freshSci
+fvfm.rr
+ggsave(fvfm.rr, filename = file.path(dir_out_fig, "FvFm_rr.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
 
 #### ALPHA REG 2 ###############################################################
 
@@ -97,7 +103,7 @@ p.alpha.reg2 <- ggplot(data= rr.figs, aes(x= Date,
                                       ymin= mean.rr.alpha.REG2 - se.rr.alpha.REG2,
                                       group= ID))
 
-p.alpha.reg2 +
+alpha.rr <- p.alpha.reg2 +
   yintercept +
   plot_errorbars +
   plot_points +
@@ -108,7 +114,7 @@ p.alpha.reg2 +
   x_axis_format +
   facet.by.algae +
   theme_rr
-ggsave(last_plot(), filename = file.path(dir_out_fig, "alphaREG2_rr.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
+ggsave(alpha.rr, filename = file.path(dir_out_fig, "alphaREG2_rr.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
 
 #### ETR MAX REG 2 #############################################################
 

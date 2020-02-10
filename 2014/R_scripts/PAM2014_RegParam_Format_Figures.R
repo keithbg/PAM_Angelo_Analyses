@@ -254,8 +254,6 @@ theme_pam_param <- theme(axis.title.x.bottom = element_blank(),
                                     group= Location))
 
   ## ETRm actual values
-source(file.path("/Users", "kbg", "Dropbox", "PAM_Angelo","PAM_Angelo_Analyses", "ggplot_themes.R"))
-
   ETRm.p +
     plot_lines +
     plot_errorbars +
@@ -274,29 +272,6 @@ source(file.path("/Users", "kbg", "Dropbox", "PAM_Angelo","PAM_Angelo_Analyses",
   #ggsave(last_plot(), filename = file.path(dir_out_fig, "ETRmREG2.pdf"), height= 8.4, width= 12.7, units= "cm", device = cairo_pdf)
   ggsave(last_plot(), filename = file.path(dir_out_fig, "ETRmREG2_2.eps"), height= 17.8*0.66, width= 17.8, units= "cm")
   
-
-  ## ETRm response ratio
-  ETRm.rr.p <- ggplot(data= reg.rr.s, aes(x= Location,
-                                       y= mean_ETRm.rr,
-                                       ymax= mean_ETRm.rr + se_ETRm.rr,
-                                       ymin= mean_ETRm.rr - se_ETRm.rr))
-
-  ETRm.rr.p +
-    yintercept +
-    plot_errorbars +
-    plot_points +
-    scale_y_continuous(limits= c(-1, 0.55), breaks= seq(-1, 0.76, by= 0.25), labels= c("-1.0", "", "0.5", "", "0.0", "", "0.5", "")) +
-    scale_fill_manual(values= treatment.fill, labels= treatment.labels, name= treatment.legend, guide= FALSE) +
-    scale_shape_manual(values= treatment.shapes, labels= treatment.labels, name= treatment.legend, guide= FALSE) +
-    #scale_linetype_manual(values= treatment.linetype, labels= treatment.labels, name= treatment.legend, guide= FALSE) +
-    labs(x= "Treatment", y= ETR.rr.label) +
-   # facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
-    facet_rep_wrap(~facet_order, nrow= 1, labeller= labeller(facet_order= algae.facet.labels)) +
-    theme_freshSci + 
-    theme_pam_param
-  
- # ggsave(last_plot(), filename = file.path(dir_out_fig, "ETRmREG2_rr.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
-  ggsave(last_plot(), filename = file.path(dir_out_fig, "ETRmREG2_rr.eps"), height= 17.8*0.66, width= 17.8, units= "cm")
   
 
   ## ETRm response ratio, data points
@@ -381,30 +356,6 @@ source(file.path("/Users", "kbg", "Dropbox", "PAM_Angelo","PAM_Angelo_Analyses",
   ggsave(last_plot(), filename = file.path(dir_out_fig, "AlphaREG2.eps"), height= 17.8*0.66, width= 17.8, units= "cm")
   
   
-  ## Alpha Response ratio
-  Alpha.rr.p <- ggplot(data= reg.rr.s, aes(x= Location,
-                                          y= mean_Alpha.rr,
-                                          ymax= mean_Alpha.rr + se_Alpha.rr,
-                                          ymin= mean_Alpha.rr - se_Alpha.rr))
-
-  Alpha.rr.p +
-    yintercept +
-    #plot_lines +
-    plot_errorbars +
-    plot_points +
-    scale_y_continuous(limits= c(-1.2, 0.3), breaks= seq(-1.25, 0.25, by= 0.25), labels= c("",  "-1.0", "", "-0.5", "", "0.0", "")) +
-    scale_fill_manual(values= treatment.fill, labels= treatment.labels, name= treatment.legend) +
-    scale_shape_manual(values= treatment.shapes, labels= treatment.labels, name= treatment.legend) +
-    scale_linetype_manual(values= treatment.linetype, labels= treatment.labels, name= treatment.legend) +
-    labs(x= "Treatment", y= Alpha.rr.label) +
-    # facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
-    # theme_pam +
-    facet_rep_wrap(~facet_order, nrow= 1, labeller= labeller(facet_order= algae.facet.labels)) +
-    theme_freshSci + 
-    theme_pam_param
-  
-  #ggsave(last_plot(), filename = file.path(dir_out_fig, "AlphaREG2_rr.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
-  ggsave(last_plot(), filename = file.path(dir_out_fig, "AlphaREG2_rr.eps"), height= 17.8*0.66, width= 17.8, units= "cm")
   
   ## Alpha response ratio, data points
   Alpha.rr.p.paired <- ggplot(data= reg.rr, aes(x= Location, y= Alpha.rr, group= pair))
@@ -468,31 +419,6 @@ source(file.path("/Users", "kbg", "Dropbox", "PAM_Angelo","PAM_Angelo_Analyses",
   #ggsave(last_plot(), filename = file.path(dir_out_fig, "FvFm.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
   ggsave(last_plot(), filename = file.path(dir_out_fig, "FvFm.eps"), height= 17.8*0.66, width= 17.8, units= "cm")
   
-  ## FvFm Response ratio
-  FvFm.rr.p <- ggplot(data= reg.rr.s, aes(x= Location,
-                                           y= mean_FvFm.rr,
-                                           ymax= mean_FvFm.rr + se_FvFm.rr,
-                                           ymin= mean_FvFm.rr - se_FvFm.rr))
-
-  FvFm.rr.p +
-    yintercept +
-    #plot_lines +
-    plot_errorbars +
-    plot_points +
-    scale_y_continuous(limits= c(-0.9, 0.3), breaks= seq(-0.8, 0.2, by= 0.2), labels= c("-0.8",  "", "0.04", "", "0.0", "")) +
-    scale_fill_manual(values= treatment.fill, name= treatment.legend) +
-    scale_shape_manual(values= treatment.shapes, name= treatment.legend) +
-    scale_linetype_manual(values= treatment.linetype, name= treatment.legend) +
-    labs(x= "Treatment", y= FvFm.rr.label) +
-    # facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
-    # theme_pam
-    facet_rep_wrap(~facet_order, nrow= 1, labeller= labeller(facet_order= algae.facet.labels)) +
-    theme_freshSci + 
-    theme_pam_param
-  
-  
- #ggsave(last_plot(), filename = file.path(dir_out_fig, "FvFm_rr.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
-  ggsave(last_plot(), filename = file.path(dir_out_fig, "FvFm_rr.eps"), height= 17.8*0.66, width= 17.8, units= "cm")
   
   ## FvFm response ratio, data points
   FvFm.rr.p.paired <- ggplot(data= reg.rr, aes(x= Location, y= FvFm.rr, group= pair))
@@ -528,3 +454,108 @@ source(file.path("/Users", "kbg", "Dropbox", "PAM_Angelo","PAM_Angelo_Analyses",
     theme_pam
   ggsave(last_plot(), filename = file.path(dir_out_fig, "FvFm_rr_d1_p2.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
 
+  
+#### COMBINE RESPONSE RATIO INTO A SINGLE FIGURE ####
+  ## FvFm Response ratio
+  FvFm.rr.p <- ggplot(data= reg.rr.s, aes(x= Location,
+                                          y= mean_FvFm.rr,
+                                          ymax= mean_FvFm.rr + se_FvFm.rr,
+                                          ymin= mean_FvFm.rr - se_FvFm.rr))
+  
+  fvfm.rr.fig <- FvFm.rr.p +
+    yintercept +
+    #plot_lines +
+    plot_errorbars +
+    plot_points +
+    scale_y_continuous(limits= c(-0.9, 0.3), breaks= seq(-0.8, 0.2, by= 0.2), labels= c("-0.8",  "", "0.04", "", "0.0", "")) +
+    scale_fill_manual(values= treatment.fill, name= treatment.legend) +
+    scale_shape_manual(values= treatment.shapes, name= treatment.legend) +
+    scale_linetype_manual(values= treatment.linetype, name= treatment.legend) +
+    labs(x= "Treatment", y= FvFm.rr.label) +
+    # facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
+    # theme_pam
+    facet_rep_wrap(~facet_order, nrow= 1, labeller= labeller(facet_order= algae.facet.labels)) +
+    theme_freshSci + 
+    theme_pam_param +
+    theme(axis.title.y = element_blank(),
+          axis.text.x = element_blank())
+  
+  fvfm.rr.fig
+  
+  #ggsave(last_plot(), filename = file.path(dir_out_fig, "FvFm_rr.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
+  ggsave(last_plot(), filename = file.path(dir_out_fig, "FvFm_rr.eps"), height= 17.8*0.66, width= 17.8, units= "cm")
+  
+  ## Alpha Response ratio
+  Alpha.rr.p <- ggplot(data= reg.rr.s, aes(x= Location,
+                                           y= mean_Alpha.rr,
+                                           ymax= mean_Alpha.rr + se_Alpha.rr,
+                                           ymin= mean_Alpha.rr - se_Alpha.rr))
+  
+  alpha.rr.fig <- Alpha.rr.p +
+    yintercept +
+    #plot_lines +
+    plot_errorbars +
+    plot_points +
+    scale_y_continuous(limits= c(-1.2, 0.3), breaks= seq(-1.25, 0.25, by= 0.25), labels= c("",  "-1.0", "", "-0.5", "", "0.0", "")) +
+    scale_fill_manual(values= treatment.fill, labels= treatment.labels, name= treatment.legend) +
+    scale_shape_manual(values= treatment.shapes, labels= treatment.labels, name= treatment.legend) +
+    scale_linetype_manual(values= treatment.linetype, labels= treatment.labels, name= treatment.legend) +
+    labs(x= "Treatment", y= Alpha.rr.label) +
+    # facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
+    # theme_pam +
+    facet_rep_wrap(~facet_order, nrow= 1, labeller= labeller(facet_order= algae.facet.labels)) +
+    theme_freshSci + 
+    theme_pam_param +
+    theme(#strip.text = element_text(color= "transparent"),
+          strip.text = element_blank(),
+          axis.title.y = element_blank(),
+          axis.text.x = element_blank())
+  
+  alpha.rr.fig
+  #ggsave(last_plot(), filename = file.path(dir_out_fig, "AlphaREG2_rr.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
+  ggsave(alpha.rr.fig, filename = file.path(dir_out_fig, "AlphaREG2_rr.eps"), height= 17.8*0.66, width= 17.8, units= "cm")
+  
+  
+  
+  
+  ## ETRm response ratio
+  ETRm.rr.p <- ggplot(data= reg.rr.s, aes(x= Location,
+                                          y= mean_ETRm.rr,
+                                          ymax= mean_ETRm.rr + se_ETRm.rr,
+                                          ymin= mean_ETRm.rr - se_ETRm.rr))
+  
+  ETRm.rr.fig <- ETRm.rr.p +
+    yintercept +
+    plot_errorbars +
+    plot_points +
+    scale_y_continuous(limits= c(-1, 0.55), breaks= seq(-1, 0.76, by= 0.25), labels= c("-1.0", "", "0.5", "", "0.0", "", "0.5", "")) +
+    scale_fill_manual(values= treatment.fill, labels= treatment.labels, name= treatment.legend, guide= FALSE) +
+    scale_shape_manual(values= treatment.shapes, labels= treatment.labels, name= treatment.legend, guide= FALSE) +
+    #scale_linetype_manual(values= treatment.linetype, labels= treatment.labels, name= treatment.legend, guide= FALSE) +
+    labs(x= "Treatment", y= ETR.rr.label) +
+    # facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
+    facet_rep_wrap(~facet_order, nrow= 1, labeller= labeller(facet_order= algae.facet.labels)) +
+    theme_freshSci + 
+    theme_pam_param +
+    theme(#strip.text = element_text(color= "transparent"),
+          strip.text = element_blank(),
+          axis.title.y = element_blank())
+  
+  ETRm.rr.fig
+  # ggsave(last_plot(), filename = file.path(dir_out_fig, "ETRmREG2_rr.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
+  ggsave(ETRm.rr.fig, filename = file.path(dir_out_fig, "ETRmREG2_rr.eps"), height= 17.8*0.66, width= 17.8, units= "cm")
+  
+  
+  
+  
+  rr.fig <- ggarrange(fvfm.rr.fig, alpha.rr.fig, ETRm.rr.fig,
+                      ncol= 1, nrow= 3,
+                      labels= c("Fv/Fm", "Alpha", "rETRmax"),
+                      font.label = list(size= 10),
+                      common.legend = TRUE, legend = "none")
+  rr.fig.anno <-  annotate_figure(rr.fig, left = text_grob(label= "Response ratio (± SE)", 
+                                           rot = 90))
+  
+  ggsave(rr.fig.anno, filename = file.path(dir_out_fig, "PAM2014_ResponseRatios_combined.eps"), height= 17.8, width= 17.8, units= "cm", device= cairo_ps)
+  
+  
