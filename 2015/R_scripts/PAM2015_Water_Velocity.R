@@ -55,7 +55,7 @@ treatment.shapes <- c(21, 21)
 
 vel.plot2 <- ggplot(data= vel.df, aes(x= rev(Treatment), y= velocity_ms * 100))
 
-vel.plot2 +
+velocity.2015.fig <- vel.plot2 +
   yintercept +
   geom_boxplot(aes(), outlier.color = "transparent") +
   geom_point(aes(fill= Treatment, shape= Treatment), position= position_jitter(width= 0.2), size= 1) +
@@ -65,9 +65,10 @@ vel.plot2 +
   scale_x_discrete(breaks= c("Thal", "Marg"), labels= c("Margin", "Thalweg")) +
   scale_y_continuous(expand= c(0.02, 0)) +
   theme_freshSci
-  
-#ggsave(last_plot(), filename = file.path(dir_out_fig, "water_velocity_plot.pdf"), height= 6.4, width= 8, units= "in", device= cairo_pdf)
-ggsave(last_plot(), filename = file.path(dir_out_fig, "water_velocity_plot.eps"), height= 8.4, width= 8.4, units= "cm")
+velocity.2015.fig
+
+#ggsave(velocity.2015.fig, filename = file.path(dir_out_fig, "water_velocity_plot.pdf"), height= 6.4, width= 8, units= "in", device= cairo_pdf)
+ggsave(velocity.2015.fig, filename = file.path(dir_out_fig, "water_velocity_plot.eps"), height= 8.4, width= 8.4, units= "cm")
 
 
 
@@ -76,6 +77,6 @@ ggsave(last_plot(), filename = file.path(dir_out_fig, "water_velocity_plot.eps")
 ## Non-parametric test of treatment effect on velocity for each day
 ## Result: Highly significant effect of treatment on velocity
 
-wilcox.test(velocity_ms ~ Treatment, data= subset(vel.df, Day == "2015-06-10"))
-wilcox.test(velocity_ms ~ Treatment, data= subset(vel.df, Day == "2015-06-11"))
-wilcox.test(velocity_ms ~ Treatment, data= subset(vel.df, Day == "2015-06-15"))
+#wilcox.test(velocity_ms ~ Treatment, data= subset(vel.df, Day == "2015-06-10"))
+#wilcox.test(velocity_ms ~ Treatment, data= subset(vel.df, Day == "2015-06-11"))
+#wilcox.test(velocity_ms ~ Treatment, data= subset(vel.df, Day == "2015-06-15"))

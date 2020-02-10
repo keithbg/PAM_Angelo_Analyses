@@ -14,6 +14,7 @@ library(scales)
 library(lme4)
 library(lmerTest)
 library(lemon)
+library(ggpubr)
 source("/Users/kbg/R_Functions/ibutton_BatchImport_14Oct2015.R")
 ################################################################################
 
@@ -171,12 +172,12 @@ theme_ibutton <- theme(panel.grid = element_blank(),
 
 #### MAKE PLOTS ################################################################
 
-temp.plot1 <- ggplot(data= pam.ib.s, aes(x= DateTimeRound,
+temp.plot <- ggplot(data= pam.ib.s, aes(x= DateTimeRound,
                                          y= mean.t,
                                          ymin= min.t,
                                          ymax= max.t))
 
-temp.plot1 +
+temp.2015.fig <- temp.plot +
   geom_ribbon(aes(fill= Treatment), alpha= 0.5) +
   labs(x="", y=expression('Temperature ('*degree*C*')')) +
   scale_y_continuous(limits= c(15, 33), labels= c("15", "20", "25", "30", "")) +
@@ -190,9 +191,22 @@ temp.plot1 +
         legend.box.spacing = unit(0, "cm"),
         legend.key.size = unit(0.25, "cm"),
         axis.title.x = element_blank())
-
+temp.2015.fig
   
-  setwd("/Users/kbg/Dropbox/PAM_Angelo/PAM_Angelo_Analyses")
+setwd("/Users/kbg/Dropbox/PAM_Angelo/PAM_Angelo_Analyses")
 #ggsave(last_plot(), filename = file.path(dir_out_fig, "temperature_plot_PAM2015.pdf"), height= 6.4, width= 8, units= "in")
 ggsave(last_plot(), filename = file.path(dir_out_fig, "temperature_plot_PAM2015.eps"), height= 12, width= 8.4, units= "cm", device= cairo_ps)
+
+
+## COMBINE TEMP AND WATER VELOCITY INTO A MULTIPANEL FIGURE
+source("2015/R_scripts/PAM2015_Water_Velocity.R")
+
+vel.temp.fig <- ggarrange(velocity.2015.fig, temp.2015.fig, 
+                    labels = c("A", "B"),
+                    ncol = 1, nrow = 2,
+                    heights= c((8.4/12*0.5), 1-(8.4/12*0.5)))
+ggsave(vel.temp.fig, filename = file.path(dir_out_fig, "vel_temp_PAM2015.png"), height= 20.4, width= 8.4, units= "cm")
+ggsave(vel.temp.fig, filename = file.path(dir_out_fig, "vel_temp_PAM2015.eps"), height= 20.4, width= 8.4, units= "cm", device= cairo_ps)
+
+
 
