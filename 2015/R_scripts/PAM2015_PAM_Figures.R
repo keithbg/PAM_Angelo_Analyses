@@ -10,6 +10,8 @@
 library(tidyverse)
 library(ggplot2)
 library(lubridate)
+library(lemon)
+library(cowplot)
 ################################################################################
 
 
@@ -171,8 +173,8 @@ reg.figs.site.blanks <- pam.figs %>%
 plot_points <- geom_point(aes(fill= Treatment, shape= Treatment),
                           position= position_dodge(width= 0.4),
                           color= "black",
-                          size= 3)
-plot_errorbars <- geom_errorbar(position= position_dodge(width= 0.4), width= 0.5)
+                          size= 2)
+plot_errorbars <- geom_errorbar(position= position_dodge(width= 0.4), width= 0.4)
 plot_lines <- geom_line(aes(group= ID, linetype= Treatment), position= position_dodge(width= 0.4), size= 0.5)
 yintercept <- geom_hline(yintercept = 0, size= 0.25)
 x_axis_format <- scale_x_date(breaks= seq.Date(as.Date("2015-06-09"), as.Date("2015-06-15"), by= 1),
@@ -182,26 +184,29 @@ treatment.labels <- c("Thalweg", "Margin")
 treatment.fill <- c("white", "black")
 treatment.linetype <- c("dashed", "solid")
 treatment.shapes <- c(21, 21)
-date.facet.labels <- as_labeller(c(`2015-06-09` = "Jun-09", `2015-06-10` = "Jun-10", `2015-06-11` = "Jun-11", `2015-06-15` = "Jun-15"))
+date.facet.labels <- as_labeller(c(`2015-06-09` = "09-Jun", `2015-06-10` = "10-Jun", `2015-06-11` = "11-Jun", `2015-06-15` = "15-Jun"))
 algae.facet.labels <- as_labeller(c(`Clad` = "Cladophora", `Oed` = "Oedogonium", `Peri` = "Periphyton"))
 
 
 ## ggplot themes
-theme_pam <- theme(panel.grid = element_blank(),
-                   plot.margin = unit(c(1, 1, 1, 1), "cm"),
-                   text = element_text(size= 14),
-                   plot.background = element_rect(fill = "transparent", color= "transparent"), # bg of the plot
-                   panel.background = element_rect(fill= "transparent", color= "transparent"),
-                   panel.border= element_rect(fill= NA, color= "black", linetype= "solid", size= 1),
-                   panel.ontop = TRUE,
-                   axis.text = element_text(colour="black"),
-                   axis.title.x = element_text(vjust = -0.75),
-                   axis.title.y = element_text(vjust = 1.5),
-                   legend.background = element_rect(size=0.25, color="black", fill= "transparent"),
-                   legend.key = element_blank(),
-                   strip.background = element_rect(fill="transparent", color= "transparent"),
-                   axis.text.x = element_text(angle= 45, hjust= 1),
-                   legend.position = "top")
+# theme_freshSci
+source(file.path("/Users", "kbg", "Dropbox", "PAM_Angelo","PAM_Angelo_Analyses", "ggplot_themes.R"))
+
+# theme_pam <- theme(panel.grid = element_blank(),
+#                    plot.margin = unit(c(1, 1, 1, 1), "cm"),
+#                    text = element_text(size= 14),
+#                    plot.background = element_rect(fill = "transparent", color= "transparent"), # bg of the plot
+#                    panel.background = element_rect(fill= "transparent", color= "transparent"),
+#                    panel.border= element_rect(fill= NA, color= "black", linetype= "solid", size= 1),
+#                    panel.ontop = TRUE,
+#                    axis.text = element_text(colour="black"),
+#                    axis.title.x = element_text(vjust = -0.75),
+#                    axis.title.y = element_text(vjust = 1.5),
+#                    legend.background = element_rect(size=0.25, color="black", fill= "transparent"),
+#                    legend.key = element_blank(),
+#                    strip.background = element_rect(fill="transparent", color= "transparent"),
+#                    axis.text.x = element_text(angle= 45, hjust= 1),
+#                    legend.position = "top")
 
 
 #### MAKE PLOTS ################################################################
@@ -215,19 +220,47 @@ lc.trt.plot1 <- ggplot(data= lc.trt.figs, aes(x= PAR,
                                      ymax= mean.trt.ETR + se.trt.ETR,
                                      group= uniqueID))
 
-lc.trt.plot1 +
-  yintercept +
+lc.fig.2015 <- lc.trt.plot1 +
+  #yintercept +
   geom_line(aes(linetype= Treatment), size= 0.25) +
   plot_errorbars +
   geom_point(aes(fill=Treatment, shape= Treatment), size = 1.5, color= "black") +
-  labs(x=expression(paste("PAR (",mu,"Mols ",m^{-2}," ", s^{-1}, ")")), y=" rETR (± se)") +
+  labs(x=expression(paste("PAR (",mu,"Mols ",m^{-2}," ", s^{-1}, ")")), y=" rETR (± SE)") +
   scale_x_continuous(limits= c(0, 4000)) +
+  scale_y_continuous(expand= c(0.02, 0)) +
   scale_linetype_manual(values= treatment.linetype, breaks= treatment.order, labels= treatment.labels) +
   scale_fill_manual(values= treatment.fill, breaks= treatment.order, labels= treatment.labels) +
   scale_shape_manual(values= treatment.shapes, breaks= treatment.order, labels= treatment.labels) +
-  facet_grid(Algae~Date, labeller= labeller(Date= date.facet.labels, Algae= algae.facet.labels)) +
-  theme_pam
-ggsave(last_plot(), filename = file.path(dir_out_fig, "light_curves_treatment_means.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
+  #facet_grid(Algae~Date, labeller= labeller(Date= date.facet.labels, Algae= algae.facet.labels)) +
+  facet_rep_grid(Algae~Date, labeller= labeller(Date= date.facet.labels, Algae= algae.facet.labels)) +
+  theme_freshSci +
+  theme(strip.text.y = element_blank(),
+        strip.text.x = element_text(face= "bold", size= 10),
+        legend.position = "top",
+        legend.margin = margin(0, 0, 0, 0, unit= "cm"),
+        legend.key.width = unit(1, "cm"),
+        legend.box.spacing = unit(0, "cm"),
+        axis.line = element_line(size= 0.25),
+        #axis.text.x = element_text(angle= 45, vjust= 1, hjust= 1))
+  )
+lc.fig.2015
+
+lc.fig.2015.anno <- plot_grid(lc.fig.2015, ncol= 1) +
+  draw_label(label= expression(italic("Cladophora")), 
+             x= 0.095, y= 0.83, size= 8, hjust= 0) +
+  draw_label(label= expression(italic("Oedogonium")), 
+             x= 0.095, y= 0.575, size= 8, hjust= 0) +
+  draw_label(label= expression("Periphyton"), 
+             x= 0.095, y= 0.32, size= 8, hjust= 0)
+  
+#lc.fig.2015.anno
+
+ggsave(lc.fig.2015.anno, filename = file.path(dir_out_fig, "PAM2015_LightCurves.eps"), height= 12.7, width= 17.8, units= "cm")
+
+
+
+
+#ggsave(last_plot(), filename = file.path(dir_out_fig, "light_curves_treatment_means.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
 
 
 lc.site.plot1 <- ggplot(data= lc.site.figs, aes(x= PAR,

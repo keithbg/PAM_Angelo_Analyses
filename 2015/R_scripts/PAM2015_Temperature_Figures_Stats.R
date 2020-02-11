@@ -153,21 +153,21 @@ facet.by.site <- facet_grid(Site~., labeller = labeller(Site= site.facet.labels)
 source(file.path("/Users", "kbg", "Dropbox", "PAM_Angelo","PAM_Angelo_Analyses", "ggplot_themes.R"))
 
 
-theme_ibutton <- theme(panel.grid = element_blank(),
-                        plot.margin = unit(c(1, 1, 1, 1), "cm"),
-                        text = element_text(size= 14),
-                        plot.background = element_rect(fill = "transparent"), # bg of the plot
-                        panel.background = element_rect(fill= "transparent", color="black"),
-                        axis.text = element_text(colour="black"),
-                        axis.title.x = element_text(vjust = -0.75),
-                        axis.title.y = element_text(vjust = 1.5),
-                        legend.background = element_rect(size=0.25, color="black", fill= "transparent"),
-                        legend.key = element_blank(),
-                        strip.background=element_rect(fill="transparent", color="transparent"),
-                        legend.position = "top",
-                        axis.text.x = element_text(angle= 45, hjust= 1))
-
-
+# theme_ibutton <- theme(panel.grid = element_blank(),
+#                         plot.margin = unit(c(1, 1, 1, 1), "cm"),
+#                         text = element_text(size= 14),
+#                         plot.background = element_rect(fill = "transparent"), # bg of the plot
+#                         panel.background = element_rect(fill= "transparent", color="black"),
+#                         axis.text = element_text(colour="black"),
+#                         axis.title.x = element_text(vjust = -0.75),
+#                         axis.title.y = element_text(vjust = 1.5),
+#                         legend.background = element_rect(size=0.25, color="black", fill= "transparent"),
+#                         legend.key = element_blank(),
+#                         strip.background=element_rect(fill="transparent", color="transparent"),
+#                         legend.position = "top",
+#                         axis.text.x = element_text(angle= 45, hjust= 1))
+# 
+# 
 
 
 #### MAKE PLOTS ################################################################
@@ -181,7 +181,7 @@ temp.2015.fig <- temp.plot +
   geom_ribbon(aes(fill= Treatment), alpha= 0.5) +
   labs(x="", y=expression('Temperature ('*degree*C*')')) +
   scale_y_continuous(limits= c(15, 33), labels= c("15", "20", "25", "30", "")) +
-  scale_x_datetime(date_breaks = "1 day", labels = date_format("%b-%d"), expand= c(0, 0)) +
+  scale_x_datetime(date_breaks = "1 day", labels = date_format("%d-%b"), expand= c(0, 0)) +
   scale_fill_manual(values= treatment.fill, breaks= treatment.order, labels= treatment.labels) +
   #facet.by.site +
   facet_rep_wrap(~Site, ncol= 1, labeller = labeller(Site= site.facet.labels)) +

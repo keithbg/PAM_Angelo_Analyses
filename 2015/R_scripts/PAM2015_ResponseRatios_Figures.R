@@ -10,6 +10,8 @@
 library(tidyverse)
 library(ggplot2)
 library(grDevices)
+library(lemon)
+library(cowplot)
 ################################################################################
 
 
@@ -19,7 +21,10 @@ dir_out_fig <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "PAM_Angelo_Anal
 ################################################################################
 
 #### READ IN DATA ##############################################################
-rr.figs <- read_tsv(file.path(dir_input, "PAM2015_response_ratios_figures.tsv"))
+rr.figs <- read_tsv(file.path(dir_input, "PAM2015_response_ratios_figures.tsv")) %>% 
+  mutate(Algae= factor(.$Algae, labels= c(expression(bolditalic("Cladophora")), 
+                                          expression(bolditalic("Oedogonium")), 
+                                          expression(bold("Periphyton")))))
 ################################################################################
 
 
@@ -27,19 +32,20 @@ rr.figs <- read_tsv(file.path(dir_input, "PAM2015_response_ratios_figures.tsv"))
 plot_points <- geom_point(aes(fill= Treatment, shape= Treatment),
                           position= position_dodge(width= 0.6),
                           color= "black",
-                          size= 3)
+                          size= 2)
 plot_errorbars <- geom_errorbar(position= position_dodge(width= 0.6), width= 0.3)
 yintercept <- geom_hline(yintercept = 0, size= 0.25)
 x_axis_format <- scale_x_date(breaks= seq.Date(as.Date("2015-06-10"), as.Date("2015-06-15"), by= 1),
-                              labels=c("Jun-10", "Jun-11", "", "", "", "Jun-15"))
+                              labels=c("10-Jun", "11-Jun", "", "", "", "15-Jun"))
 
 treatment.order <- c("Thal", "Marg")
 treatment.labels <- c("Thalweg", "Margin")
 treatment.fill <- c("white", "black")
 treatment.shapes <- c(21, 21)
-algae.facet.labels <- as_labeller(c(`Clad` = expression(italic("Cladophora")), `Oed` = expression(italic("Oedogonium")), `Peri` = "Periphyton"))
-algae.facet.labels <- as_labeller(c(`Clad` = "Cladophora", `Oed` = "Oedogonium", `Peri` = "Periphyton"))
-facet.by.algae <- facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels))
+#algae.facet.labels <- as_labeller(c(`Clad` = expression(italic("Cladophora")), `Oed` = expression(italic("Oedogonium")), `Peri` = "Periphyton"))
+#algae.facet.labels <- as_labeller(c(`Clad` = "Cladophora", `Oed` = "Oedogonium", `Peri` = "Periphyton"))
+#facet.by.algae <- facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels))
+facet.by.algae <- facet_rep_grid(.~Algae, labeller= label_parsed)
 
 
 ## ggplot theme for response ratio plots
@@ -47,21 +53,21 @@ facet.by.algae <- facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labe
 source(file.path("/Users", "kbg", "Dropbox", "PAM_Angelo","PAM_Angelo_Analyses", "ggplot_themes.R"))
 
 
-theme_rr <- theme(panel.grid = element_blank(),
-                   plot.margin = unit(c(1, 1, 1, 1), "cm"),
-                   text = element_text(size= 14),
-                  plot.background = element_rect(fill = "transparent", color= "transparent"), # bg of the plot
-                  panel.background = element_rect(fill= "transparent", color= "transparent"),
-                  panel.border= element_rect(fill= NA, color= "black", linetype= "solid", size= 1),
-                  panel.ontop = TRUE,
-                   axis.text = element_text(colour="black"),
-                   axis.title.x = element_text(vjust = -0.75),
-                   axis.title.y = element_text(vjust = 1.5),
-                   legend.background = element_rect(size=0.25, color="black", fill= "transparent"),
-                   legend.key = element_blank(),
-                   strip.background=element_rect(fill="transparent", color="transparent"),
-                   axis.text.x = element_text(angle= 45, hjust= 1),
-                   legend.position = "top")
+# theme_rr <- theme(panel.grid = element_blank(),
+#                    plot.margin = unit(c(1, 1, 1, 1), "cm"),
+#                    text = element_text(size= 14),
+#                   plot.background = element_rect(fill = "transparent", color= "transparent"), # bg of the plot
+#                   panel.background = element_rect(fill= "transparent", color= "transparent"),
+#                   panel.border= element_rect(fill= NA, color= "black", linetype= "solid", size= 1),
+#                   panel.ontop = TRUE,
+#                    axis.text = element_text(colour="black"),
+#                    axis.title.x = element_text(vjust = -0.75),
+#                    axis.title.y = element_text(vjust = 1.5),
+#                    legend.background = element_rect(size=0.25, color="black", fill= "transparent"),
+#                    legend.key = element_blank(),
+#                    strip.background=element_rect(fill="transparent", color="transparent"),
+#                    axis.text.x = element_text(angle= 45, hjust= 1),
+#                    legend.position = "top")
 
 
 
@@ -91,7 +97,15 @@ fvfm.rr <- p.fv.fm +
   x_axis_format +
   facet.by.algae +
  # theme_rr +
-  theme_freshSci
+  theme_freshSci +
+  theme(
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        legend.position = "top",
+        legend.margin = margin(0, 0, 0, 0, unit= "cm"),
+        legend.box.spacing = unit(0, "cm"),
+        axis.line = element_line(size= 0.25))
 fvfm.rr
 ggsave(fvfm.rr, filename = file.path(dir_out_fig, "FvFm_rr.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
 
@@ -113,7 +127,12 @@ alpha.rr <- p.alpha.reg2 +
   scale_shape_manual(values= treatment.shapes, breaks= treatment.order, labels= treatment.labels) +
   x_axis_format +
   facet.by.algae +
-  theme_rr
+  theme_freshSci +
+  theme(strip.text = element_blank(),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        axis.text.x = element_blank())
+
 ggsave(alpha.rr, filename = file.path(dir_out_fig, "alphaREG2_rr.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
 
 #### ETR MAX REG 2 #############################################################
@@ -124,7 +143,7 @@ p.ETRmax.reg2 <- ggplot(data= rr.figs, aes(x= Date,
                                      ymin= mean.rr.ETRm.REG2 - se.rr.ETRm.REG2,
                                      group= ID))
 
-p.ETRmax.reg2 +
+etrm.rr <- p.ETRmax.reg2 +
   yintercept +
   plot_errorbars +
   plot_points +
@@ -134,9 +153,13 @@ p.ETRmax.reg2 +
   scale_shape_manual(values= treatment.shapes, breaks= treatment.order, labels= treatment.labels) +
   x_axis_format +
   facet.by.algae +
-  theme_rr +
-  theme(axis.text.x = element_text(angle= 45, hjust= 1),
-        legend.position = "top")
+  theme_freshSci +
+  theme(strip.text = element_blank(),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        axis.text.x = element_text(angle= 45, hjust= 1, vjust= 1)
+  )
+
 ggsave(last_plot(), filename = file.path(dir_out_fig, "ETRmaxREG2_rr.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
 
 #### Ek    #####################################################################
@@ -161,8 +184,24 @@ p.Ek.reg2 +
 ggsave(last_plot(), filename = file.path(dir_out_fig, "EkREG2_rr.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
 
 
+#### COMBINED PLOT FOR MANUSCRIPT #####
 
 
+rr.fig.2015 <- plot_grid(fvfm.rr, 
+                    alpha.rr + theme(legend.position="none"), 
+                    etrm.rr + theme(legend.position= "none"), 
+                    ncol= 1, nrow= 3) +
+  draw_label(label= expression(bold(paste("F"[v]~"/"~"F"[m]))), x= 0.01, y= 0.89, size= 10, hjust= 0) +
+  draw_label(label= expression(bold("Alpha")), x= 0.01, y= 0.64, size= 10, hjust= 0) +
+  draw_label(label= expression(bold(paste("rETR"[max]))), x= 0.01, y= 0.31, size= 10, hjust= 0)
+#rr.fig.2015
+
+
+rr.fig.2015.anno <-  annotate_figure(rr.fig.2015, 
+                                left = text_grob(label= "Response ratio (± SE)", 
+                                                 rot = 90, size= 10))
+
+ggsave(rr.fig.2015.anno, filename = file.path(dir_out_fig, "PAM2015_ResponseRatios_combined.eps"), height= 12.7, width= 17.8, units= "cm")
 
 
 
