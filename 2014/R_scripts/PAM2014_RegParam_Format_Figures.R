@@ -8,6 +8,8 @@
 library(tidyverse)
 library(ggplot2)
 library(lemon) #facet_rep_wrap()
+library(ggpubr) #ggarrange()
+library(cowplot)
 ################################################################################
 
 #### FILE PATHS ################################################################
@@ -457,6 +459,17 @@ theme_pam_param <- theme(axis.title.x.bottom = element_blank(),
   
 #### COMBINE RESPONSE RATIO INTO A SINGLE FIGURE ####
   ## FvFm Response ratio
+  
+
+  
+  reg.rr.s$facet_order <- factor(reg.rr.s$facet_order, 
+                                 labels= c(expression(italic("Cladophora")~"Red"),
+                                           expression(italic("Cladophora")~"Yellow"),
+                                           expression(italic("Anabaena")~"Spires"),
+                                           expression(italic("Microcoleus")),
+                                           expression(italic("Nostoc")),
+                                           expression(italic("Rivularia"))))
+  
   FvFm.rr.p <- ggplot(data= reg.rr.s, aes(x= Location,
                                           y= mean_FvFm.rr,
                                           ymax= mean_FvFm.rr + se_FvFm.rr,
@@ -474,7 +487,8 @@ theme_pam_param <- theme(axis.title.x.bottom = element_blank(),
     labs(x= "Treatment", y= FvFm.rr.label) +
     # facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
     # theme_pam
-    facet_rep_wrap(~facet_order, nrow= 1, labeller= labeller(facet_order= algae.facet.labels)) +
+    #facet_rep_wrap(~facet_order, nrow= 1, labeller= labeller(facet_order= algae.facet.labels)) +
+    facet_rep_wrap(~facet_order, nrow= 1, labeller= label_parsed) +
     theme_freshSci + 
     theme_pam_param +
     theme(axis.title.y = element_blank(),
@@ -529,8 +543,8 @@ theme_pam_param <- theme(axis.title.x.bottom = element_blank(),
     plot_errorbars +
     plot_points +
     scale_y_continuous(limits= c(-1, 0.55), breaks= seq(-1, 0.76, by= 0.25), labels= c("-1.0", "", "0.5", "", "0.0", "", "0.5", "")) +
-    scale_fill_manual(values= treatment.fill, labels= treatment.labels, name= treatment.legend, guide= FALSE) +
-    scale_shape_manual(values= treatment.shapes, labels= treatment.labels, name= treatment.legend, guide= FALSE) +
+    scale_fill_manual(values= treatment.fill, labels= treatment.labels, name= treatment.legend) +
+    scale_shape_manual(values= treatment.shapes, labels= treatment.labels, name= treatment.legend) +
     #scale_linetype_manual(values= treatment.linetype, labels= treatment.labels, name= treatment.legend, guide= FALSE) +
     labs(x= "Treatment", y= ETR.rr.label) +
     # facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
@@ -546,16 +560,39 @@ theme_pam_param <- theme(axis.title.x.bottom = element_blank(),
   ggsave(ETRm.rr.fig, filename = file.path(dir_out_fig, "ETRmREG2_rr.eps"), height= 17.8*0.66, width= 17.8, units= "cm")
   
   
+
+
   
   
-  rr.fig <- ggarrange(fvfm.rr.fig, alpha.rr.fig, ETRm.rr.fig,
-                      ncol= 1, nrow= 3,
-                      labels= c("Fv/Fm", "Alpha", "rETRmax"),
-                      font.label = list(size= 10),
-                      common.legend = TRUE, legend = "none")
-  rr.fig.anno <-  annotate_figure(rr.fig, left = text_grob(label= "Response ratio (± SE)", 
-                                           rot = 90))
   
-  ggsave(rr.fig.anno, filename = file.path(dir_out_fig, "PAM2014_ResponseRatios_combined.eps"), height= 17.8, width= 17.8, units= "cm", device= cairo_ps)
+  rr.fig <- plot_grid(fvfm.rr.fig  + theme(legend.position="none"), 
+                       alpha.rr.fig + theme(legend.position="none"), 
+                       ETRm.rr.fig + theme(legend.position="none"), 
+                       ncol= 1, nrow= 3) +
+                       #rel_heights = c(0.1, 1, 1, 1)) +
+    draw_label(label= expression(bold(paste("F"[v]~"/"~"F"[m]))), x= 0.01, y= 0.955, size= 10, hjust= 0) +
+    draw_label(label= expression(bold("Alpha")), x= 0.01, y= 0.66, size= 10, hjust= 0) +
+    draw_label(label= expression(bold(paste("rETR"[max]))), x= 0.01, y= 0.33, size= 10, hjust= 0)
+  
+
+  
+  rr.fig.anno <-  annotate_figure(rr.fig, 
+                                   left = text_grob(label= "Response ratio (± SE)", 
+                                                    rot = 90),
+                                   
+                                   bottom= text_grob(label= "Treatment", vjust= -0.5))
+
+  ggsave(rr.fig.anno, filename = file.path(dir_out_fig, "PAM2014_ResponseRatios_combined.eps"), height= 17.8, width= 17.8, units= "cm")
+
+  # Can't use expression() with ggarrange labels, so I used cowplot to make the multi-panel figure
+  # rr.fig <- ggarrange(fvfm.rr.fig + theme(legend.position="none"), 
+  #                     alpha.rr.fig + theme(legend.position="none"), 
+  #                     ETRm.rr.fig + theme(legend.position="none"),
+  #                     ncol= 1, nrow= 3,
+  #                     labels= c("Fv/Fm", "Alpha", "rETRmax"),
+  #                     font.label = list(size= 10),
+  #                     common.legend = TRUE, legend = "none")
+  # rr.fig.anno <-  annotate_figure(rr.fig, left = text_grob(label= "Response ratio (± SE)", 
+  #                                          rot = 90))
   
   

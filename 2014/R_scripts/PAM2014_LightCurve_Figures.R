@@ -8,6 +8,8 @@
 #### LIBRARIES #################################################################
 library(tidyverse)
 library(ggplot2)
+library(lemon)
+library(cowplot)
 ################################################################################
 
 #### FILE PATHS ################################################################
@@ -29,7 +31,13 @@ lc.df.s <- lc.df %>%
     N = length(ETR),
     mean_ETR = mean(ETR),
     sd_ETR = sd(ETR),
-    se_ETR = sd_ETR / sqrt(N))
+    se_ETR = sd_ETR / sqrt(N)) %>% 
+  mutate(facet_order= ifelse(Algae == "Clad_R", "1", 
+                      ifelse(Algae == "Clad_Y", "2", 
+                             ifelse(Algae == "Cyano_Spires", "3", 
+                                    ifelse(Algae == "Phorm", "4", 
+                                           ifelse(Algae == "Nostoc", "5",
+                                                  ifelse(Algae == "Riv", "6", "7")))))))
 
 
 
@@ -39,7 +47,7 @@ plot_points_lc <- geom_point(aes(fill= Location, shape= Location),
                           color= "black",
                           size= 2)
 plot_errorbars_lc <- geom_errorbar(width= 0.2)
-plot_lines_lc <- geom_line(aes(group= Location, linetype= Location), size= 0.5)
+plot_lines_lc <- geom_line(aes(group= Location, linetype= Location), size= 0.4)
 yintercept <- geom_hline(yintercept = 0, size= 0.25)
 x_axis_format <- scale_x_discrete(breaks= c(0, 1), labels= c("23-Jul", "24-Jul"))
 treatment.fill <- c("black", "white")
@@ -50,17 +58,21 @@ treatment.legend <- "Treatment"
 ETR.label <- paste("rETRmax (± se)")
 
 
-algae.facet.labels <- as_labeller(c(`Cyano_Spires` = "Anabaena\nSpires",
-                                    `Nostoc` = "Nostoc",
-                                    `Phorm` = "Microcoleus",
-                                    `Riv` = "Rivularia",
-                                    `Clad_R` = "Cladophora\nRed",
-                                    `Clad_Y` = "Cladophora\nYellow"))
+# algae.facet.labels <- as_labeller(c(`Cyano_Spires` = "Anabaena\nSpires",
+#                                     `Nostoc` = "Nostoc",
+#                                     `Phorm` = "Microcoleus",
+#                                     `Riv` = "Rivularia",
+#                                     `Clad_R` = "Cladophora\nRed",
+#                                     `Clad_Y` = "Cladophora\nYellow"))
 
 day.facet.labels <- as_labeller(c(`0` = "23-Jul",
                                     `1` = "24-Jul"))
 
 ## ggplot themes
+# theme_freshSci
+source(file.path("/Users", "kbg", "Dropbox", "PAM_Angelo","PAM_Angelo_Analyses", "ggplot_themes.R"))
+
+
 theme_pam <- theme(panel.grid = element_blank(),
                    plot.margin = unit(c(1, 1, 1, 1), "cm"),
                    text = element_text(size= 14),
@@ -88,7 +100,7 @@ lc.p <- ggplot(data= lc.df.s, aes(x= PAR,
                                   ymin= mean_ETR - se_ETR,
                                   group= Location))
 
-lc.p +
+lc.fig <- lc.p +
   plot_lines_lc +
   plot_errorbars_lc +
   plot_points_lc +
@@ -96,9 +108,48 @@ lc.p +
   scale_fill_manual(values= treatment.fill, name= treatment.legend) +
   scale_shape_manual(values= treatment.shapes, name= treatment.legend) +
   scale_linetype_manual(values= treatment.linetype, name= treatment.legend) +
-  labs(x=expression(paste("PAR (",mu,"Mols ",m^{-2}," ", s^{-1}, ")")), y="rETR (± se)") +
-  facet_grid(Algae~Day, labeller= labeller(Algae= algae.facet.labels, Day= day.facet.labels)) +
-  theme_pam
-ggsave(last_plot(), filename = file.path(dir_out_fig, "PAM2014_LightCurves.pdf"), height= 8, width= 6.4, units= "in", device = cairo_pdf)
+  labs(x=expression(paste("PAR (",mu,"Mols ",m^{-2}," ", s^{-1}, ")")), y="rETR (± SE)") +
+  #facet_rep_grid(Algae~Day, labeller= labeller(Algae= algae.facet.labels, Day= day.facet.labels)) +
+  facet_rep_grid(facet_order~Day, labeller= labeller(Day= day.facet.labels)) +
+  theme_freshSci +
+  theme(strip.text.y = element_blank(),
+        strip.text.x = element_text(face= "bold", size= 10),
+        legend.position = "top",
+        legend.margin = margin(0, 0, 0, 0, unit= "cm"),
+        legend.key.width = unit(1, "cm"),
+        legend.box.spacing = unit(0, "cm"),
+        axis.line = element_line(size= 0.25))
+#lc.fig
+
+lc.fig.anno <- plot_grid(lc.fig, ncol= 1) +
+  draw_label(label= expression(paste(italic("Cladophora")," Red")), 
+                                          x= 0.12, y= 0.85, size= 8, hjust= 0) +
+  draw_label(label= expression(paste(italic("Cladophora")," Yellow")), 
+             x= 0.12, y= 0.72, size= 8, hjust= 0) +
+  draw_label(label= expression(paste(italic("Anabaena")," Spires")), 
+             x= 0.12, y= 0.59, size= 8, hjust= 0) +
+  draw_label(label= expression(italic("Microcoleus")), 
+             x= 0.12, y= 0.465, size= 8, hjust= 0) +
+  draw_label(label= expression(italic("Nostoc")), 
+             x= 0.12, y= .34, size= 8, hjust= 0) +
+  draw_label(label= expression(italic("Rivularia")), 
+             x= 0.12, y= 0.21, size= 8, hjust= 0)
+lc.fig.anno
+
+ggsave(lc.fig.anno, filename = file.path(dir_out_fig, "PAM2014_LightCurves.eps"), height= 12.7, width= 12.7, units= "cm")
+
+#ggsave(last_plot(), filename = file.path(dir_out_fig, "PAM2014_LightCurves.pdf"), height= 8, width= 6.4, units= "in", device = cairo_pdf)
 
 
+# lc.p +
+#   plot_lines_lc +
+#   plot_errorbars_lc +
+#   plot_points_lc +
+#   scale_x_continuous(limits= c(0, 1250), expand= c(0.02, 0)) +
+#   scale_fill_manual(values= treatment.fill, name= treatment.legend) +
+#   scale_shape_manual(values= treatment.shapes, name= treatment.legend) +
+#   scale_linetype_manual(values= treatment.linetype, name= treatment.legend) +
+#   labs(x=expression(paste("PAR (",mu,"Mols ",m^{-2}," ", s^{-1}, ")")), y="rETR (± se)") +
+#   facet_grid(Algae~Day, labeller= labeller(Algae= algae.facet.labels, Day= day.facet.labels)) +
+#   theme_pam
+# 
