@@ -12,6 +12,7 @@ library(ggplot2)
 library(grDevices)
 library(lemon)
 library(cowplot)
+library(ggpubr)
 ################################################################################
 
 
@@ -106,8 +107,8 @@ fvfm.rr <- p.fv.fm +
         legend.margin = margin(0, 0, 0, 0, unit= "cm"),
         legend.box.spacing = unit(0, "cm"),
         axis.line = element_line(size= 0.25))
-fvfm.rr
-ggsave(fvfm.rr, filename = file.path(dir_out_fig, "FvFm_rr.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
+#fvfm.rr
+#ggsave(fvfm.rr, filename = file.path(dir_out_fig, "FvFm_rr.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
 
 #### ALPHA REG 2 ###############################################################
 
@@ -193,9 +194,16 @@ rr.fig.2015 <- plot_grid(fvfm.rr,
                     ncol= 1, nrow= 3) +
   draw_label(label= expression(bold(paste("F"[v]~"/"~"F"[m]))), x= 0.01, y= 0.89, size= 10, hjust= 0) +
   draw_label(label= expression(bold("Alpha")), x= 0.01, y= 0.64, size= 10, hjust= 0) +
-  draw_label(label= expression(bold(paste("rETR"[max]))), x= 0.01, y= 0.31, size= 10, hjust= 0)
+  draw_label(label= expression(bold(paste("rETR"[max]))), x= 0.01, y= 0.31, size= 10, hjust= 0) +
+  # Significant treatment labels
+  draw_label(label= "Treatment: p < 0.05", x= 0.26, y= 0.85, size= 6, hjust= 0) +
+  draw_label(label= "Treatment: p < 0.05", x= 0.56, y= 0.85, size= 6, hjust= 0) 
+  
+ 
 #rr.fig.2015
 
+
+  
 
 rr.fig.2015.anno <-  annotate_figure(rr.fig.2015, 
                                 left = text_grob(label= "Response ratio (± SE)", 
