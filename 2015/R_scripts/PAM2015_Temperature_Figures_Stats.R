@@ -22,6 +22,7 @@ source("/Users/kbg/R_Functions/ibutton_BatchImport_14Oct2015.R")
 #### FILE PATHS ################################################################
 dir_input <- file.path("2015", "PAM_data")
 dir_out_fig <- file.path("2015", "Figures")
+dir_out_fig_manuscript <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "Manuscript_Drafts", "Manuscript_Figures")
 dir_out_table <- file.path("2015", "PAM_data")
 ################################################################################
 
@@ -199,6 +200,7 @@ ggsave(last_plot(), filename = file.path(dir_out_fig, "temperature_plot_PAM2015.
 
 
 ## COMBINE TEMP AND WATER VELOCITY INTO A MULTIPANEL FIGURE
+setwd("/Users/kbg/Dropbox/PAM_Angelo/PAM_Angelo_Analyses")
 source("2015/R_scripts/PAM2015_Water_Velocity.R")
 
 vel.temp.fig <- ggarrange(velocity.2015.fig, temp.2015.fig, 
@@ -207,6 +209,9 @@ vel.temp.fig <- ggarrange(velocity.2015.fig, temp.2015.fig,
                     heights= c((8.4/12*0.5), 1-(8.4/12*0.5)))
 ggsave(vel.temp.fig, filename = file.path(dir_out_fig, "vel_temp_PAM2015.png"), height= 20.4, width= 8.4, units= "cm")
 ggsave(vel.temp.fig, filename = file.path(dir_out_fig, "vel_temp_PAM2015.eps"), height= 20.4, width= 8.4, units= "cm", device= cairo_ps)
+
+ggsave(vel.temp.fig, filename = file.path(dir_out_fig_manuscript, "Fig_5.eps"), height= 20.4, width= 8.4, units= "cm", device= cairo_ps)
+
 
 
 

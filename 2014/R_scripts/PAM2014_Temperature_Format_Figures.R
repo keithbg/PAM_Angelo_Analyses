@@ -13,6 +13,7 @@ library(scales)
 #### FILE PATHS ################################################################
 dir_input <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "PAM_data", "raw_data", "iButton_data")
 dir_out_fig <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo","PAM_Angelo_Analyses", "2014", "Figures")
+dir_out_fig_manuscript <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "Manuscript_Drafts", "Manuscript_Figures")
 #dir_out_table <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "2014", "Data")
 ################################################################################
 
@@ -65,6 +66,7 @@ theme_freshSci <- theme(panel.grid = element_blank(),
   ## ggplot themes
   # theme_freshSci
   source(file.path("/Users", "kbg", "Dropbox", "PAM_Angelo","PAM_Angelo_Analyses", "ggplot_themes.R"))
+  
   theme_ibutton <- theme(panel.grid = element_blank(),
                          plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm"),
                          text = element_text(size= 14),
@@ -124,6 +126,7 @@ theme_freshSci <- theme(panel.grid = element_blank(),
           axis.text.x = element_text(angle= 0, hjust= 0.5))
   #ggsave(last_plot(), filename = file.path(dir_out_fig, "PAM2014_temperature_plot_reps.pdf"), height= 6.4, width= 8, units= "in")
   ggsave(last_plot(), filename = file.path(dir_out_fig, "PAM2014_temperature_plot_reps.eps"), height= 8.4, width= 8.4, units= "cm")
+  ggsave(last_plot(), filename = file.path(dir_out_fig_manuscript, "Fig_2.eps"), height= 8.4, width= 8.4, units= "cm")
   
 
 

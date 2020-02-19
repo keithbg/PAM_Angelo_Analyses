@@ -18,6 +18,7 @@ library(cowplot)
 #### FILE PATHS ################################################################
 dir_input <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "PAM_Angelo_Analyses", "2015", "PAM_data")
 dir_out_fig <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "PAM_Angelo_Analyses", "2015", "Figures")
+dir_out_fig_manuscript <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "Manuscript_Drafts", "Manuscript_Figures")
 ################################################################################
 
 #### READ IN AND FORMAT DATA ##############################################################
@@ -256,6 +257,7 @@ lc.fig.2015.anno <- plot_grid(lc.fig.2015, ncol= 1) +
 #lc.fig.2015.anno
 
 ggsave(lc.fig.2015.anno, filename = file.path(dir_out_fig, "PAM2015_LightCurves.eps"), height= 12.7, width= 17.8, units= "cm")
+ggsave(lc.fig.2015.anno, filename = file.path(dir_out_fig_manuscript, "Fig_6.eps"), height= 12.7, width= 17.8, units= "cm")
 
 
 

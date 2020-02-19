@@ -15,6 +15,7 @@ library(cowplot)
 #### FILE PATHS ################################################################
 dir_input <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "PAM_data")
 dir_out_fig <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "Figures")
+dir_out_fig_manuscript <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "Manuscript_Drafts", "Manuscript_Figures")
 ################################################################################
 
 lc.df <- read_tsv(file.path(dir_input, "PAM2014_clean_light_curve2.tsv")) %>%
@@ -32,12 +33,12 @@ lc.df.s <- lc.df %>%
     mean_ETR = mean(ETR),
     sd_ETR = sd(ETR),
     se_ETR = sd_ETR / sqrt(N)) %>% 
-  mutate(facet_order= ifelse(Algae == "Clad_R", "1", 
-                      ifelse(Algae == "Clad_Y", "2", 
-                             ifelse(Algae == "Cyano_Spires", "3", 
-                                    ifelse(Algae == "Phorm", "4", 
-                                           ifelse(Algae == "Nostoc", "5",
-                                                  ifelse(Algae == "Riv", "6", "7")))))))
+  mutate(facet_order= ifelse(Algae == "Clad_R", "2", 
+                      ifelse(Algae == "Clad_Y", "1", 
+                             ifelse(Algae == "Cyano_Spires", "6", 
+                                    ifelse(Algae == "Phorm", "5", 
+                                           ifelse(Algae == "Nostoc", "4",
+                                                  ifelse(Algae == "Riv", "3", "7")))))))
 
 
 
@@ -54,7 +55,6 @@ treatment.fill <- c("black", "white")
 treatment.linetype <- c("solid", "dashed")
 treatment.shapes <- c(21, 21)
 treatment.legend <- "Treatment"
-
 ETR.label <- paste("rETRmax (± se)")
 
 
@@ -122,21 +122,22 @@ lc.fig <- lc.p +
 #lc.fig
 
 lc.fig.anno <- plot_grid(lc.fig, ncol= 1) +
-  draw_label(label= expression(paste(italic("Cladophora")," Red")), 
-                                          x= 0.12, y= 0.85, size= 8, hjust= 0) +
   draw_label(label= expression(paste(italic("Cladophora")," Yellow")), 
+                                          x= 0.12, y= 0.85, size= 8, hjust= 0) +
+  draw_label(label= expression(paste(italic("Cladophora")," Red")), 
              x= 0.12, y= 0.72, size= 8, hjust= 0) +
-  draw_label(label= expression(paste(italic("Anabaena")," Spires")), 
-             x= 0.12, y= 0.59, size= 8, hjust= 0) +
-  draw_label(label= expression(italic("Microcoleus")), 
-             x= 0.12, y= 0.465, size= 8, hjust= 0) +
-  draw_label(label= expression(italic("Nostoc")), 
-             x= 0.12, y= .34, size= 8, hjust= 0) +
   draw_label(label= expression(italic("Rivularia")), 
+             x= 0.12, y= 0.59, size= 8, hjust= 0) +
+  draw_label(label= expression(italic("Nostoc")), 
+             x= 0.12, y= 0.465, size= 8, hjust= 0) +
+  draw_label(label= expression(italic("Microcoleus")), 
+             x= 0.12, y= .34, size= 8, hjust= 0) +
+  draw_label(label= expression(paste(italic("Anabaena")," Spires")), 
              x= 0.12, y= 0.21, size= 8, hjust= 0)
 lc.fig.anno
 
 ggsave(lc.fig.anno, filename = file.path(dir_out_fig, "PAM2014_LightCurves.eps"), height= 12.7, width= 12.7, units= "cm")
+ggsave(lc.fig.anno, filename = file.path(dir_out_fig_manuscript, "Fig_3.eps"), height= 12.7, width= 12.7, units= "cm")
 
 #ggsave(last_plot(), filename = file.path(dir_out_fig, "PAM2014_LightCurves.pdf"), height= 8, width= 6.4, units= "in", device = cairo_pdf)
 

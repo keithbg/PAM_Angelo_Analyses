@@ -19,6 +19,8 @@ library(ggpubr)
 #### FILE PATHS ################################################################
 dir_input <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "PAM_Angelo_Analyses", "2015", "PAM_data")
 dir_out_fig <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "PAM_Angelo_Analyses", "2015", "Figures")
+dir_out_fig_manuscript <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "Manuscript_Drafts", "Manuscript_Figures")
+
 ################################################################################
 
 #### READ IN DATA ##############################################################
@@ -196,11 +198,15 @@ rr.fig.2015 <- plot_grid(fvfm.rr,
   draw_label(label= expression(bold("Alpha")), x= 0.01, y= 0.64, size= 10, hjust= 0) +
   draw_label(label= expression(bold(paste("rETR"[max]))), x= 0.01, y= 0.31, size= 10, hjust= 0) +
   # Significant treatment labels
-  draw_label(label= "Treatment: p < 0.05", x= 0.26, y= 0.85, size= 6, hjust= 0) +
-  draw_label(label= "Treatment: p < 0.05", x= 0.56, y= 0.85, size= 6, hjust= 0) 
+  draw_label(label= "Treatment: p < 0.05", x= 0.23, y= 0.85, size= 6, hjust= 0) +
+  draw_label(label= "Treatment: p < 0.05", x= 0.53, y= 0.85, size= 6, hjust= 0) +
+  draw_label(label= "Treatment: p < 0.05", x= 0.83, y= 0.85, size= 6, hjust= 0) +
+  draw_label(label= "Treatment: p < 0.05", x= 0.83, y= 0.62, size= 6, hjust= 0) 
+
+
   
  
-#rr.fig.2015
+rr.fig.2015
 
 
   
@@ -210,6 +216,7 @@ rr.fig.2015.anno <-  annotate_figure(rr.fig.2015,
                                                  rot = 90, size= 10))
 
 ggsave(rr.fig.2015.anno, filename = file.path(dir_out_fig, "PAM2015_ResponseRatios_combined.eps"), height= 12.7, width= 17.8, units= "cm")
+ggsave(rr.fig.2015.anno, filename = file.path(dir_out_fig_manuscript, "Fig_7.eps"), height= 12.7, width= 17.8, units= "cm")
 
 
 

@@ -15,6 +15,7 @@ library(cowplot)
 #### FILE PATHS ################################################################
 dir_input <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "PAM_data")
 dir_out_fig <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "Figures")
+dir_out_fig_manuscript <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "Manuscript_Drafts", "Manuscript_Figures")
 dir_out_table <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "PAM_data")
 ################################################################################
 
@@ -153,12 +154,12 @@ reg.rr.s <- reg.rr %>%
                 sd_FvFm.rr = sd(FvFm.rr),
                 se_FvFm.rr = sd_FvFm.rr / sqrt(N)) %>%
               ungroup() %>% 
-  mutate(facet_order= ifelse(Algae == "Clad_R", "1", 
-                             ifelse(Algae == "Clad_Y", "2", 
-                                    ifelse(Algae == "Cyano_Spires", "3", 
-                                           ifelse(Algae == "Phorm", "4", 
-                                                  ifelse(Algae == "Nostoc", "5",
-                                                         ifelse(Algae == "Riv", "6", "7")))))))
+  mutate(facet_order= ifelse(Algae == "Clad_R", "2", 
+                             ifelse(Algae == "Clad_Y", "1", 
+                                    ifelse(Algae == "Cyano_Spires", "6", 
+                                           ifelse(Algae == "Phorm", "5", 
+                                                  ifelse(Algae == "Nostoc", "4",
+                                                         ifelse(Algae == "Riv", "3", "7")))))))
 
 ## Submerged/Floating response ratios
    ## Calculate the response ratio for floating and Submerged parameter values for day 1 for each replicate
@@ -458,23 +459,20 @@ theme_pam_param <- theme(axis.title.x.bottom = element_blank(),
 
   
 #### COMBINE RESPONSE RATIO INTO A SINGLE FIGURE ####
-  ## FvFm Response ratio
-  
 
-  
   reg.rr.s$facet_order <- factor(reg.rr.s$facet_order, 
-                                 labels= c(expression(italic("Cladophora")~"Red"),
-                                           expression(italic("Cladophora")~"Yellow"),
-                                           expression(italic("Anabaena")~"Spires"),
-                                           expression(italic("Microcoleus")),
+                                 labels= c(expression(italic("Cladophora")~"Yellow"),
+                                           expression(italic("Cladophora")~"Red"),
+                                           expression(italic("Rivularia")),
                                            expression(italic("Nostoc")),
-                                           expression(italic("Rivularia"))))
+                                           expression(italic("Microcoleus")),
+                                           expression(italic("Anabaena")~"Spires")))
   
+  ## FvFm Response ratio
   FvFm.rr.p <- ggplot(data= reg.rr.s, aes(x= Location,
                                           y= mean_FvFm.rr,
                                           ymax= mean_FvFm.rr + se_FvFm.rr,
                                           ymin= mean_FvFm.rr - se_FvFm.rr))
-  
   fvfm.rr.fig <- FvFm.rr.p +
     yintercept +
     #plot_lines +
@@ -570,9 +568,9 @@ theme_pam_param <- theme(axis.title.x.bottom = element_blank(),
                        ETRm.rr.fig + theme(legend.position="none"), 
                        ncol= 1, nrow= 3) +
                        #rel_heights = c(0.1, 1, 1, 1)) +
-    draw_label(label= expression(bold(paste("F"[v]~"/"~"F"[m]))), x= 0.01, y= 0.955, size= 10, hjust= 0) +
-    draw_label(label= expression(bold("Alpha")), x= 0.01, y= 0.66, size= 10, hjust= 0) +
-    draw_label(label= expression(bold(paste("rETR"[max]))), x= 0.01, y= 0.33, size= 10, hjust= 0)
+    draw_label(label= expression(bold(paste("F"[v]~"/"~"F"[m]))), x= 0.008, y= 0.95, size= 10, hjust= 0) +
+    draw_label(label= expression(bold("Alpha")), x= 0.008, y= 0.655, size= 10, hjust= 0) +
+    draw_label(label= expression(bold(paste("rETR"[max]))), x= 0.008, y= 0.325, size= 10, hjust= 0)
   
 
   
@@ -583,7 +581,8 @@ theme_pam_param <- theme(axis.title.x.bottom = element_blank(),
                                    bottom= text_grob(label= "Treatment", vjust= -0.5))
 
   ggsave(rr.fig.anno, filename = file.path(dir_out_fig, "PAM2014_ResponseRatios_combined.eps"), height= 17.8, width= 17.8, units= "cm")
-
+  ggsave(rr.fig.anno, filename = file.path(dir_out_fig_manuscript, "Fig_4.eps"), height= 17.8, width= 17.8, units= "cm")
+  
   # Can't use expression() with ggarrange labels, so I used cowplot to make the multi-panel figure
   # rr.fig <- ggarrange(fvfm.rr.fig + theme(legend.position="none"), 
   #                     alpha.rr.fig + theme(legend.position="none"), 
