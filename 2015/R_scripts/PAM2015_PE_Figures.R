@@ -226,7 +226,7 @@ lc.fig.2015 <- lc.trt.plot1 +
   geom_line(aes(linetype= Treatment), size= 0.25) +
   plot_errorbars +
   geom_point(aes(fill=Treatment, shape= Treatment), size = 1.5, color= "black") +
-  labs(x=expression(paste("PAR (",mu,"Mols ",m^{-2}," ", s^{-1}, ")")), y=" rETR (± SE)") +
+  labs(x=expression(paste("PAR (",mu,"Mols ",m^{-2}," ", s^{-1}, ")")), y="Relative electron transfer rate (rETR ± SE)") +
   scale_x_continuous(limits= c(0, 4000)) +
   scale_y_continuous(expand= c(0.02, 0)) +
   scale_linetype_manual(values= treatment.linetype, breaks= treatment.order, labels= treatment.labels) +
@@ -251,13 +251,13 @@ lc.fig.2015.anno <- plot_grid(lc.fig.2015, ncol= 1) +
              x= 0.095, y= 0.83, size= 8, hjust= 0) +
   draw_label(label= expression(italic("Oedogonium")), 
              x= 0.095, y= 0.575, size= 8, hjust= 0) +
-  draw_label(label= expression("Periphyton"), 
+  draw_label(label= expression("Epilithic diatoms"), 
              x= 0.095, y= 0.32, size= 8, hjust= 0)
   
 #lc.fig.2015.anno
 
 ggsave(lc.fig.2015.anno, filename = file.path(dir_out_fig, "PAM2015_LightCurves.eps"), height= 12.7, width= 17.8, units= "cm")
-ggsave(lc.fig.2015.anno, filename = file.path(dir_out_fig_manuscript, "Fig_6.eps"), height= 12.7, width= 17.8, units= "cm")
+ggsave(lc.fig.2015.anno, filename = file.path(dir_out_fig_manuscript, "Fig_7.eps"), height= 12.7, width= 17.8, units= "cm")
 
 
 

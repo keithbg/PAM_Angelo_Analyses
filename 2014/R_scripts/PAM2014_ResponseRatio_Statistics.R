@@ -17,6 +17,7 @@ library(lsmeans)
 #### FILE PATHS ################################################################
 dir_input <- file.path("2014", "PAM_data")
 dir_out_table <- file.path("2014", "PAM_data")
+dir_out_fig_manuscript <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "Manuscript_Drafts", "Manuscript_Figures")
 ################################################################################
 
 
@@ -303,6 +304,7 @@ for(param in c("Alpha.rr", "ETRm.rr", "FvFm.rr")){
 }
 #t.test.output
 #arrange(t.test.output, p_value)
+#p.adjust(t.test.output$p_value, method= "fdr")
 write_tsv(t.test.output, path= file.path(dir_out_table, "t_test_output_2014.tsv"))
 
 ## See effect of increasing degrees of freedom on p values, for the given t values
@@ -354,3 +356,98 @@ new.df <- func.group.stats %>%
   arrange(Rep)
 
 summary(lm(param ~ func_group, data= new.df))
+
+
+#### POWER ANALYSIS
+# library(psych)  Cohen's D= effect size = (mean1 - mean2) / pooled std. deviation
+## Turns out that cohen's D is the same as unpaired t-values
+## When calculating t-values t.test(var.equal= FALSE), so the welch's approximation for std. deviation was used in the test
+## Therefore, I will use the paired t-test values as my effect size, rather than the unpaired values 
+
+## Showing that t value == Cohen's D
+# pa.df <- filter(rr.stats, Algae == "Clad_R") %>% 
+#   mutate(trt= ifelse(Treatment == "Submerged", 0, 1)) %>% 
+#   dplyr::select(trt, Alpha.rr, ETRm.rr)
+# 
+# d.res <- cohen.d(pa.df, group= "trt")
+
+# Read in t_values
+effects <- read_tsv(file.path(dir_out_table, "t_test_output_2014.tsv")) %>% 
+  filter(test == "paired") %>% 
+  rename(effect_size= t_value) #%>% 
+  #select(parameter, algae, test, effect_size)
+
+
+# Function to calculate power
+calc_power <- function(reps){
+  require(pwr) # pwr.t.test()
+  
+  power_list <- map(effects$effect_size, function(x) pwr.t.test(d= x, n= reps, 
+                                                                sig.level= 0.05, type="paired", 
+                                                                alternative="two.sided")$power)
+
+      names(power_list) <- str_c(effects$parameter, effects$algae, sep= "-")
+  power_df <- bind_rows(power_list)
+  power_df <- power_df %>% 
+    mutate(rep= reps) %>% 
+    dplyr::select(rep, everything())
+  return(power_df)
+}
+
+# Loop function over various replicate values
+# actual experiment had n=3
+power_curves <- map(seq(from= 3, to= 10, by= 1), function(x) calc_power(x))
+
+# Bind into a data frame
+power_curves_df <- bind_rows(power_curves) %>% 
+  pivot_longer(names_to= "algae_param", values_to = "power", -rep) %>% 
+  mutate(param= str_replace(algae_param, "-.*$", ""),
+         algae= str_replace(algae_param, "^.*-", "")) %>% 
+  mutate(facet_order= ifelse(algae == "Clad_R", "2", 
+                             ifelse(algae == "Clad_Y", "1", 
+                                    ifelse(algae == "Ana_Spires", "6", 
+                                           ifelse(algae == "Microcoleus", "5", 
+                                                  ifelse(algae == "Nostoc", "4",
+                                                         ifelse(algae == "Riv", "3", "7")))))))
+
+
+
+# Plot curves
+source(file.path("/Users", "kbg", "Dropbox", "PAM_Angelo","PAM_Angelo_Analyses", "ggplot_themes.R"))
+library(ggsci)
+library(lemon) #facet_rep_wrap()
+dir_out_fig <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "Figures")
+
+algae.facet.labels <- as_labeller(c(`6` = "Anabaena\nSpires",
+                                    `4` = "Nostoc",
+                                    `5`= "Microcoleus",
+                                    `3` = "Rivularia",
+                                    `2` = "Cladophora\nRed",
+                                    `1` = "Cladophora\nYellow",
+                                    `7` = "Blank"))
+
+
+ggplot(power_curves_df, aes(x= rep, y= power)) +
+  geom_line(aes(color= param)) +
+  geom_point(aes(color= param), size= 1.5) +
+  labs(x= "Number of replicates", y= "Power") +
+  scale_x_continuous(breaks= seq(from=3, to= 10, by= 1),
+                     labels= c("3", "", "5", "", "7", "", "9", "")) +
+  scale_y_continuous(limits= c(0, 1.05), expand= c(0, 0)) +
+  scale_color_startrek(name= "Parameter", labels= c("Alpha", "rETRmax", "Fv/Fm")) +
+  facet_rep_wrap(~facet_order, nrow= 2, labeller= labeller(facet_order= algae.facet.labels)) +
+  #facet_rep_wrap(~algae, nrow= 2) +
+  theme_freshSci
+
+ggsave(last_plot(), filename = file.path(dir_out_fig, "2014_power_analysis.pdf"), height= 17.8*0.66, width= 17.8, units= "cm", device= cairo_pdf)
+ggsave(last_plot(), filename = file.path(dir_out_fig_manuscript, "Fig_S3.eps"), height= 17.8*0.66, width= 17.8, units= "cm", device= cairo_ps)
+
+
+
+#write_tsv(effects, file.path(dir_out_fig, "power_analysis.txt"))
+# ggplot(power_curves_df, aes(x= rep, y= power)) +
+#   geom_line() +
+#   geom_point() +
+#   scale_x_continuous(breaks= seq(from=3, to= 10, by= 2)) +
+#   facet_wrap(~ algae_param, nrow= 3) +
+#   theme_classic()

@@ -1,4 +1,4 @@
-`## Figures for the PAM 2014 experiment
+## Figures for the PAM 2014 experiment
 ## with Yvonne, Paula, and Mary
 
 ## KBG Oct-2018
@@ -57,14 +57,6 @@ treatment.shapes <- c(21, 21)
 treatment.legend <- "Treatment"
 ETR.label <- paste("rETRmax (± se)")
 
-
-# algae.facet.labels <- as_labeller(c(`Cyano_Spires` = "Anabaena\nSpires",
-#                                     `Nostoc` = "Nostoc",
-#                                     `Phorm` = "Microcoleus",
-#                                     `Riv` = "Rivularia",
-#                                     `Clad_R` = "Cladophora\nRed",
-#                                     `Clad_Y` = "Cladophora\nYellow"))
-
 day.facet.labels <- as_labeller(c(`0` = "23-Jul",
                                     `1` = "24-Jul"))
 
@@ -108,7 +100,7 @@ lc.fig <- lc.p +
   scale_fill_manual(values= treatment.fill, name= treatment.legend) +
   scale_shape_manual(values= treatment.shapes, name= treatment.legend) +
   scale_linetype_manual(values= treatment.linetype, name= treatment.legend) +
-  labs(x=expression(paste("PAR (",mu,"Mols ",m^{-2}," ", s^{-1}, ")")), y="rETR (± SE)") +
+  labs(x=expression(paste("PAR (",mu,"Mols ",m^{-2}," ", s^{-1}, ")")), y= "Relative electron transfer rate (rETR ± SE)") +
   #facet_rep_grid(Algae~Day, labeller= labeller(Algae= algae.facet.labels, Day= day.facet.labels)) +
   facet_rep_grid(facet_order~Day, labeller= labeller(Day= day.facet.labels)) +
   theme_freshSci +
@@ -137,7 +129,7 @@ lc.fig.anno <- plot_grid(lc.fig, ncol= 1) +
 lc.fig.anno
 
 ggsave(lc.fig.anno, filename = file.path(dir_out_fig, "PAM2014_LightCurves.eps"), height= 12.7, width= 12.7, units= "cm")
-ggsave(lc.fig.anno, filename = file.path(dir_out_fig_manuscript, "Fig_3.eps"), height= 12.7, width= 12.7, units= "cm")
+ggsave(lc.fig.anno, filename = file.path(dir_out_fig_manuscript, "Fig_4.eps"), height= 12.7, width= 12.7, units= "cm")
 
 #ggsave(last_plot(), filename = file.path(dir_out_fig, "PAM2014_LightCurves.pdf"), height= 8, width= 6.4, units= "in", device = cairo_pdf)
 

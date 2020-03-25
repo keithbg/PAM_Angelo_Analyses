@@ -33,14 +33,15 @@ import.pathway <- file.path(dir_input, "ibutton_data")
 
 ## Run import function and format data frame
 pam.ib <- ibutton.batch.import(import.pathway) %>%
-            as_tibble() %>%
-            filter(DateTimeR >= "2015-06-10 00:00:00" & DateTimeR <= "2015-06-15 17:00:00") %>% # filter by times the iButtons were in the water
-            mutate(ArrayID= str_replace(ID, "sc", ""),
-                   Site= str_replace(ArrayID, ".[0-9]", ""),
-                   Pseudorep= str_replace(ID, "sc[0-9].", ""),
-                   Treatment= ifelse(Pseudorep == "1" | Pseudorep == "2" | Pseudorep == "3", "Thalweg",
-                                     ifelse(Pseudorep == "4" | Pseudorep == "5" | Pseudorep == "6", "Margin", "cooler"))) %>%
-            select(-ID, -DateTime)
+  as_tibble() %>%
+  filter(DateTimeR >= "2015-06-10 00:00:00" & DateTimeR <= "2015-06-15 17:00:00") %>% # filter by times the iButtons were in the water
+  mutate(ID= str_replace(ID, "^.*ibutton_data\\/", "")) %>% 
+  mutate(ArrayID= str_replace(ID, "sc", ""),
+         Site= str_replace(ArrayID, ".[0-9]", ""),
+         Pseudorep= str_replace(ID, "sc[0-9].", ""),
+         Treatment= ifelse(Pseudorep == "1" | Pseudorep == "2" | Pseudorep == "3", "Thalweg",
+                           ifelse(Pseudorep == "4" | Pseudorep == "5" | Pseudorep == "6", "Margin", "cooler"))) %>%
+  select(-ID, -DateTime)
 
 ## Summarize for plotting
 pam.ib.s <- pam.ib %>%
@@ -194,7 +195,7 @@ temp.2015.fig <- temp.plot +
         axis.title.x = element_blank())
 temp.2015.fig
   
-setwd("/Users/kbg/Dropbox/PAM_Angelo/PAM_Angelo_Analyses")
+#setwd("/Users/kbg/Dropbox/PAM_Angelo/PAM_Angelo_Analyses")
 #ggsave(last_plot(), filename = file.path(dir_out_fig, "temperature_plot_PAM2015.pdf"), height= 6.4, width= 8, units= "in")
 ggsave(last_plot(), filename = file.path(dir_out_fig, "temperature_plot_PAM2015.eps"), height= 12, width= 8.4, units= "cm", device= cairo_ps)
 
@@ -210,7 +211,7 @@ vel.temp.fig <- ggarrange(velocity.2015.fig, temp.2015.fig,
 ggsave(vel.temp.fig, filename = file.path(dir_out_fig, "vel_temp_PAM2015.png"), height= 20.4, width= 8.4, units= "cm")
 ggsave(vel.temp.fig, filename = file.path(dir_out_fig, "vel_temp_PAM2015.eps"), height= 20.4, width= 8.4, units= "cm", device= cairo_ps)
 
-ggsave(vel.temp.fig, filename = file.path(dir_out_fig_manuscript, "Fig_5.eps"), height= 20.4, width= 8.4, units= "cm", device= cairo_ps)
+ggsave(vel.temp.fig, filename = file.path(dir_out_fig_manuscript, "Fig_6.eps"), height= 20.4, width= 8.4, units= "cm", device= cairo_ps)
 
 
 
