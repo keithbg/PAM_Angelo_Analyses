@@ -10,6 +10,8 @@ library(ggplot2)
 library(lemon) #facet_rep_wrap()
 library(ggpubr) #ggarrange()
 library(cowplot)
+library(extrafont) #https://github.com/wch/extrafont
+loadfonts(device= "postscript")
 ################################################################################
 
 #### FILE PATHS ################################################################
@@ -127,7 +129,7 @@ reg.rr <- reg.data %>%
                                                    ifelse(Algae == "Nostoc", "4",
                                                           ifelse(Algae == "Riv", "3", "7")))))))
 
-write_tsv(reg.rr, path= file.path(dir_out_table, "PAM2014_clean_REG2_response_ratios.tsv") )
+#write_tsv(reg.rr, path= file.path(dir_out_table, "PAM2014_clean_REG2_response_ratios.tsv") )
 
 
 ## Summarize response ratios
@@ -229,7 +231,7 @@ algae.facet.labels <- as_labeller(c(`6` = "Anabaena\nSpires",
 
 ## ggplot themes
 # theme_freshSci
-source(file.path("/Users", "kbg", "Dropbox", "PAM_Angelo","PAM_Angelo_Analyses", "ggplot_themes.R"))
+source("ggplot_themes.R")
 
 
 theme_pam_param <- theme(axis.title.x.bottom = element_blank(),
@@ -273,6 +275,7 @@ fvfm.rr.fig <- FvFm.rr.p +
   theme_pam_param +
   theme(axis.title.y = element_blank(),
         axis.text.x = element_blank())
+        #strip.text = element_text(margin= margin(0, 0, 10, 0, unit= ("pt"))))
 
 fvfm.rr.fig
 
@@ -348,10 +351,10 @@ rr.fig <- plot_grid(fvfm.rr.fig  + theme(legend.position="none"),
                     ncol= 1, nrow= 3) +
   #rel_heights = c(0.1, 1, 1, 1)) +
   draw_label(label= expression(bold(paste("F"[v]~"/"~"F"[m]))), x= 0.008, y= 0.95, size= 10, hjust= 0) +
-  draw_label(label= expression(bold("Alpha")), x= 0.008, y= 0.655, size= 10, hjust= 0) +
+  #draw_label(label= expression(bold("Alpha")), x= 0.008, y= 0.655, size= 10, hjust= 0) +
+  draw_label(label= expression(bold(paste("Alpha (\U03B1)"))), x= 0.008, y= 0.655, size= 10, hjust= 0) +
   draw_label(label= expression(bold(paste("rETR"[max]))), x= 0.008, y= 0.325, size= 10, hjust= 0)
-
-
+rr.fig
 
 rr.fig.anno <-  annotate_figure(rr.fig, 
                                 left = text_grob(label= "Response ratio (± SE)", 
@@ -359,8 +362,8 @@ rr.fig.anno <-  annotate_figure(rr.fig,
                                 
                                 bottom= text_grob(label= "Treatment", vjust= -0.5))
 
-ggsave(rr.fig.anno, filename = file.path(dir_out_fig, "PAM2014_ResponseRatios_combined.eps"), height= 17.8, width= 17.8, units= "cm")
-ggsave(rr.fig.anno, filename = file.path(dir_out_fig_manuscript, "Fig_5.eps"), height= 17.8, width= 17.8, units= "cm")
+ggsave(rr.fig.anno, filename = file.path(dir_out_fig, "PAM2014_ResponseRatios_combined.eps"), height= 17.8, width= 17.8, units= "cm", device= cairo_ps)
+ggsave(rr.fig.anno, filename = file.path(dir_out_fig_manuscript, "Fig_5.eps"), height= 17.8, width= 17.8, units= "cm", device= cairo_ps)
 
 
 ##### INDIVIDUAL FIGURES ####

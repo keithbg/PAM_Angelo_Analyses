@@ -2,7 +2,7 @@
 
 theme_freshSci <- theme(panel.grid = element_blank(),
                         plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm"),
-                        text = element_text(size= 10),
+                        text = element_text(size= 10, family= "Arial"),
                         plot.background = element_rect(fill = "transparent", color= "transparent"), # bg of the plot
                         panel.background = element_rect(fill= "transparent", color= "transparent"),
                         panel.border= element_rect(fill= NA, color= NA, linetype= "solid", size= 1),

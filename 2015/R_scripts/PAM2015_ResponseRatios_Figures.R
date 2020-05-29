@@ -13,6 +13,8 @@ library(grDevices)
 library(lemon)
 library(cowplot)
 library(ggpubr)
+library(extrafont) #https://github.com/wch/extrafont
+loadfonts(device= "postscript")
 ################################################################################
 
 
@@ -53,8 +55,7 @@ facet.by.algae <- facet_rep_grid(.~Algae, labeller= label_parsed)
 
 ## ggplot theme for response ratio plots
 # theme_freshSci
-source(file.path("/Users", "kbg", "Dropbox", "PAM_Angelo","PAM_Angelo_Analyses", "ggplot_themes.R"))
-
+source("ggplot_themes.R")
 
 # theme_rr <- theme(panel.grid = element_blank(),
 #                    plot.margin = unit(c(1, 1, 1, 1), "cm"),
@@ -165,26 +166,6 @@ etrm.rr <- p.ETRmax.reg2 +
 
 ggsave(last_plot(), filename = file.path(dir_out_fig, "ETRmaxREG2_rr.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
 
-#### Ek    #####################################################################
-
-p.Ek.reg2 <- ggplot(data= rr.figs, aes(x= Date,
-                                           y= mean.rr.Ek.REG2,
-                                           ymax= mean.rr.Ek.REG2 + se.rr.Ek.REG2,
-                                           ymin= mean.rr.Ek.REG2 - se.rr.Ek.REG2,
-                                           group= ID))
-
-p.Ek.reg2 +
-  yintercept +
-  plot_errorbars +
-  plot_points +
- scale_y_continuous(limits= c(-0.12, 0.6), breaks= seq(-0.1, 0.6, by= 0.1), labels= c("", "0", "", "0.2", "",  "0.4", "", "0.6")) +
-  labs(x= "", y= bquote("Mean" ~ E[k] ~ "± se")) +
-  scale_fill_manual(values= treatment.fill) +
-  scale_shape_manual(values= treatment.shapes) +
-  x_axis_format +
-  facet.by.algae +
-  theme_rr
-ggsave(last_plot(), filename = file.path(dir_out_fig, "EkREG2_rr.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
 
 
 #### COMBINED PLOT FOR MANUSCRIPT #####
@@ -196,7 +177,7 @@ rr.fig.2015 <- plot_grid(fvfm.rr,
                     rel_heights = c(1.3, 1, 1.2),
                     ncol= 1, nrow= 3) +
   draw_label(label= expression(bold(paste("F"[v]~"/"~"F"[m]))), x= 0.01, y= 0.89, size= 10, hjust= 0) +
-  draw_label(label= expression(bold("Alpha")), x= 0.01, y= 0.61, size= 10, hjust= 0) +
+  draw_label(label= expression(bold("Alpha (\U03B1)")), x= 0.01, y= 0.61, size= 10, hjust= 0) +
   draw_label(label= expression(bold(paste("rETR"[max]))), x= 0.01, y= 0.33, size= 10, hjust= 0) +
   # Significant treatment labels
   draw_label(label= "Treatment: p < 0.05", x= 0.23, y= 0.85, size= 6, hjust= 0) +
@@ -208,21 +189,40 @@ rr.fig.2015 <- plot_grid(fvfm.rr,
   draw_label(label= "Treatment: p < 0.05", x= 0.53, y= 0.30, size= 6, hjust= 0) 
 #rr.fig.2015
 
-git rr.fig.2015.anno <-  annotate_figure(rr.fig.2015, 
+rr.fig.2015.anno <-  annotate_figure(rr.fig.2015, 
                                      left = text_grob(label= "Response ratio (± SE)", 
                                                       rot = 90, size= 10))
 
-ggsave(rr.fig.2015.anno, filename = file.path(dir_out_fig_manuscript, "Fig_8.eps"), height= 12.7, width= 17.8, units= "cm")
-
-ggsave(rr.fig.2015.anno, filename = file.path(dir_out_fig, "PAM2015_ResponseRatios_combined.eps"), height= 12.7, width= 17.8, units= "cm")
-
-
-
-
-  
+ggsave(rr.fig.2015.anno, filename = file.path(dir_out_fig_manuscript, "Fig_8.eps"), height= 12.7, width= 17.8, units= "cm", device= cairo_ps)
+ggsave(rr.fig.2015.anno, filename = file.path(dir_out_fig, "PAM2015_ResponseRatios_combined.eps"), height= 12.7, width= 17.8, units= "cm", device= cairo_ps)
 
 
 
 
 
 
+
+
+
+
+
+#### Ek    #####################################################################
+
+p.Ek.reg2 <- ggplot(data= rr.figs, aes(x= Date,
+                                       y= mean.rr.Ek.REG2,
+                                       ymax= mean.rr.Ek.REG2 + se.rr.Ek.REG2,
+                                       ymin= mean.rr.Ek.REG2 - se.rr.Ek.REG2,
+                                       group= ID))
+
+p.Ek.reg2 +
+  yintercept +
+  plot_errorbars +
+  plot_points +
+  scale_y_continuous(limits= c(-0.12, 0.6), breaks= seq(-0.1, 0.6, by= 0.1), labels= c("", "0", "", "0.2", "",  "0.4", "", "0.6")) +
+  labs(x= "", y= bquote("Mean" ~ E[k] ~ "± se")) +
+  scale_fill_manual(values= treatment.fill) +
+  scale_shape_manual(values= treatment.shapes) +
+  x_axis_format +
+  facet.by.algae +
+  theme_rr
+ggsave(last_plot(), filename = file.path(dir_out_fig, "EkREG2_rr.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
