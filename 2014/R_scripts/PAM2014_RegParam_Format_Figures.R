@@ -1,8 +1,11 @@
-## Read in and format and plot PI curve data  from the PAM 2014 experiment
-## with Yvonne, Paula, and Mary
+## 2014 PAM Angelo Experiment
+
+## Read in and format and plot PE curve parameters 
+## Alpha and rETRmax calculated from PAM data in script PAM2014_PEcurve_Format.R
+## Fv/Fm from raw PAM data
 
 ## Created by KBG January-2016
-## Revised by KBG August-2018
+
 
 #### LIBRARIES #################################################################
 library(tidyverse)
@@ -15,49 +18,21 @@ loadfonts(device= "postscript")
 ################################################################################
 
 #### FILE PATHS ################################################################
-dir_input <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "PAM_data")
-dir_out_fig <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "Figures")
-dir_out_fig_manuscript <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "Manuscript_Drafts", "Manuscript_Figures")
-dir_out_table <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "PAM_data")
+dir_input <- file.path("2014", "PAM_data")
+dir_out_fig <- file.path("2014", "Figures")
+dir_out_fig_manuscript <- file.path("..", "Manuscript_Drafts", "Manuscript_Figures")
+dir_out_table <- file.path("2014", "PAM_data")
 ################################################################################
 
 
 
 #### REGRESSION PARAMETERS CALCULATED BY KBG ###################################
-#### in script PAM2014_PI_curve_Format.R
+#### in script PAM2014_PEcurve_Format.R
 reg.data <- read_tsv(file.path(dir_input, "PAM2014_clean_REG_params.tsv")) %>%
              select(-contains("REG1"), -REG2.RSS) %>%
              rename(Alpha= REG2.alpha, ETRm= REG2.ETRm, Ek= REG2.Ek) %>% 
              mutate(Location= as.factor(ifelse(Location == "Benthic", "Submerged", "Floating")))
 reg.data$Location <- factor(reg.data$Location, levels= levels(reg.data$Location)[c(2, 1)])
-
-
-##### PREVIOUS CALCULATIONS FROM YVONNE #######################################
-#### Read in and format data ####
-#   r0 <- read_csv(file.path(dir_input,"raw_data", "Algae_Type_Day0_REG2_KBG.csv"))
-#   r1 <- read_csv(file.path(dir_input, "raw_data", "Algae_Type_Day1_REG2_KBG.csv"))
-#   reg <- rbind(r0, r1)
-#
-#
-# #### ALPHA AND ETRmax
-# reg <- reg %>%
-#          mutate(
-#            Date= as.Date(.$Date, "%m/%d/%y"),
-#            Location= ifelse((reg$Rep == 1 | reg$Rep ==3 | reg$Rep == 5), "Benthic", "Floating"),
-#            Day= as.character(ifelse(Date == "2014-07-23", 0, 1)),
-#            TreatID= as.character(paste(Day, Algae, Location, sep=".")),
-#            uniqueID= as.factor(paste(Algae, Treatment, Rep, sep="."))
-#          ) %>%
-#         arrange(Date, Algae, Location)
-#
-# ## Format algae names
-# reg <- reg %>%
-#         mutate(Algae= ifelse(Algae == "Cyano Spires", "Spires",
-#                              ifelse(Algae == "Nostoc brains", "Nostoc",
-#                                     ifelse(Algae == "Phormidium", "Microcoleus",
-#                                            ifelse(Algae == "Rusty Cladophora", "Clad_R",
-#                                                   ifelse(Algae == "Yellow Cladophora", "Clad_Y", Algae))))))
-#
 
 ## Summarize parameters for the three replicates
 reg.s <- reg.data %>%
@@ -83,9 +58,15 @@ reg.s <- reg.data %>%
                                                   ifelse(Algae == "Nostoc", "4",
                                                          ifelse(Algae == "Riv", "3", "7")))))))
 
+reg.s$facet_order <- factor(reg.s$facet_order, 
+                            labels= c(expression(italic("Cladophora")~"Yellow"),
+                                      expression(italic("Cladophora")~"Red"),
+                                      expression(italic("Rivularia")),
+                                      expression(italic("Nostoc")),
+                                      expression(italic("Microcoleus")),
+                                      expression(italic("Anabaena")~"Spires")))
 
-
-#### Fv/Fm, Fo ####
+#### Import Fv/Fm, Fo ####
 lc.df <- read_tsv(file.path(dir_input, "PAM2014_clean_light_curve.tsv"))
 
 FvFM.Fo.df <- lc.df %>%
@@ -100,7 +81,6 @@ FvFM.Fo.df <- lc.df %>%
     sd_FvFm = sd(FvFm),
     se_FvFm = sd_FvFm / sqrt(N)
   )
-
 
 
 #### RESPONSE RATIOS ###########################################################
@@ -129,7 +109,7 @@ reg.rr <- reg.data %>%
                                                    ifelse(Algae == "Nostoc", "4",
                                                           ifelse(Algae == "Riv", "3", "7")))))))
 
-#write_tsv(reg.rr, path= file.path(dir_out_table, "PAM2014_clean_REG2_response_ratios.tsv") )
+write_tsv(reg.rr, path= file.path(dir_out_table, "PAM2014_clean_REG2_response_ratios.tsv") )
 
 
 ## Summarize response ratios
@@ -203,7 +183,7 @@ plot_points <- geom_point(aes(fill= Location, shape= Location),
 plot_errorbars <- geom_errorbar(position= position_dodge(width= 0.4), width= 0.5,size= 0.3)
 plot_lines <- geom_line(aes(group= Location, linetype= Location), position= position_dodge(width= 0.4), size= 0.3)
 yintercept <- geom_hline(yintercept = 0, size= 0.25)
-x_axis_day <- scale_x_discrete(breaks= c(0, 1), labels= c("23-Jul", "24-Jul"))
+x_axis_day <-   scale_x_discrete(breaks= c("0", "1"), labels= c("23-Jul", "24-Jul"))
 treatment.fill <- c("black", "white")
 treatment.labels <- c("Submerged", "Floating")
 treatment.linetype <- c("solid", "dashed")
@@ -218,15 +198,6 @@ Alpha.rr.label <- paste("Alpha response ratio (± SE)")
 
 FvFm.label <- expression(F[v]/F[m]~" (± SE)")
 FvFm.rr.label <- expression(F[v]/F[m]~" response ratio (± SE)")
-
-
-algae.facet.labels <- as_labeller(c(`6` = "Anabaena\nSpires",
-                                    `4` = "Nostoc",
-                                    `5`= "Microcoleus",
-                                    `3` = "Rivularia",
-                                    `2` = "Cladophora\nRed",
-                                    `1` = "Cladophora\nYellow",
-                                    `7` = "Blank"))
 
 
 ## ggplot themes
@@ -259,7 +230,6 @@ FvFm.rr.p <- ggplot(data= reg.rr.s, aes(x= Location,
                                         ymin= mean_FvFm.rr - se_FvFm.rr))
 fvfm.rr.fig <- FvFm.rr.p +
   yintercept +
-  #plot_lines +
   plot_errorbars +
   plot_points +
   scale_y_continuous(limits= c(-0.9, 0.3), breaks= seq(-0.8, 0.2, by= 0.2), labels= c("-0.8",  "", "0.04", "", "0.0", "")) +
@@ -267,10 +237,7 @@ fvfm.rr.fig <- FvFm.rr.p +
   scale_shape_manual(values= treatment.shapes, name= treatment.legend) +
   scale_linetype_manual(values= treatment.linetype, name= treatment.legend) +
   labs(x= "Treatment", y= FvFm.rr.label) +
-  # facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
-  # theme_pam
-  #facet_rep_wrap(~facet_order, nrow= 1, labeller= labeller(facet_order= algae.facet.labels)) +
-  facet_rep_wrap(~facet_order, nrow= 1, labeller= label_parsed) +
+    facet_rep_wrap(~facet_order, nrow= 1, labeller= label_parsed) +
   theme_freshSci + 
   theme_pam_param +
   theme(axis.title.y = element_blank(),
@@ -282,6 +249,7 @@ fvfm.rr.fig
 #ggsave(last_plot(), filename = file.path(dir_out_fig, "FvFm_rr.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
 ggsave(last_plot(), filename = file.path(dir_out_fig, "FvFm_rr.eps"), height= 17.8*0.66, width= 17.8, units= "cm")
 
+
 ## Alpha Response ratio
 Alpha.rr.p <- ggplot(data= reg.rr.s, aes(x= Location,
                                          y= mean_Alpha.rr,
@@ -290,7 +258,6 @@ Alpha.rr.p <- ggplot(data= reg.rr.s, aes(x= Location,
 
 alpha.rr.fig <- Alpha.rr.p +
   yintercept +
-  #plot_lines +
   plot_errorbars +
   plot_points +
   scale_y_continuous(limits= c(-1.2, 0.3), breaks= seq(-1.25, 0.25, by= 0.25), labels= c("",  "-1.0", "", "-0.5", "", "0.0", "")) +
@@ -298,9 +265,7 @@ alpha.rr.fig <- Alpha.rr.p +
   scale_shape_manual(values= treatment.shapes, labels= treatment.labels, name= treatment.legend) +
   scale_linetype_manual(values= treatment.linetype, labels= treatment.labels, name= treatment.legend) +
   labs(x= "Treatment", y= Alpha.rr.label) +
-  # facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
-  # theme_pam +
-  facet_rep_wrap(~facet_order, nrow= 1, labeller= labeller(facet_order= algae.facet.labels)) +
+  facet_rep_wrap(~facet_order, nrow= 1, labeller= label_parsed) +
   theme_freshSci + 
   theme_pam_param +
   theme(#strip.text = element_text(color= "transparent"),
@@ -328,10 +293,8 @@ ETRm.rr.fig <- ETRm.rr.p +
   scale_y_continuous(limits= c(-1, 0.55), breaks= seq(-1, 0.76, by= 0.25), labels= c("-1.0", "", "0.5", "", "0.0", "", "0.5", "")) +
   scale_fill_manual(values= treatment.fill, labels= treatment.labels, name= treatment.legend) +
   scale_shape_manual(values= treatment.shapes, labels= treatment.labels, name= treatment.legend) +
-  #scale_linetype_manual(values= treatment.linetype, labels= treatment.labels, name= treatment.legend, guide= FALSE) +
   labs(x= "Treatment", y= ETR.rr.label) +
-  # facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
-  facet_rep_wrap(~facet_order, nrow= 1, labeller= labeller(facet_order= algae.facet.labels)) +
+  facet_rep_wrap(~facet_order, nrow= 1, labeller= label_parsed) +
   theme_freshSci + 
   theme_pam_param +
   theme(#strip.text = element_text(color= "transparent"),
@@ -349,9 +312,7 @@ rr.fig <- plot_grid(fvfm.rr.fig  + theme(legend.position="none"),
                     alpha.rr.fig + theme(legend.position="none"), 
                     ETRm.rr.fig + theme(legend.position="none"), 
                     ncol= 1, nrow= 3) +
-  #rel_heights = c(0.1, 1, 1, 1)) +
   draw_label(label= expression(bold(paste("F"[v]~"/"~"F"[m]))), x= 0.008, y= 0.95, size= 10, hjust= 0) +
-  #draw_label(label= expression(bold("Alpha")), x= 0.008, y= 0.655, size= 10, hjust= 0) +
   draw_label(label= expression(bold(paste("Alpha (\U03B1)"))), x= 0.008, y= 0.655, size= 10, hjust= 0) +
   draw_label(label= expression(bold(paste("rETR"[max]))), x= 0.008, y= 0.325, size= 10, hjust= 0)
 rr.fig
@@ -362,221 +323,108 @@ rr.fig.anno <-  annotate_figure(rr.fig,
                                 
                                 bottom= text_grob(label= "Treatment", vjust= -0.5))
 
-ggsave(rr.fig.anno, filename = file.path(dir_out_fig, "PAM2014_ResponseRatios_combined.eps"), height= 17.8, width= 17.8, units= "cm", device= cairo_ps)
 ggsave(rr.fig.anno, filename = file.path(dir_out_fig_manuscript, "Fig_5.eps"), height= 17.8, width= 17.8, units= "cm", device= cairo_ps)
 
 
-##### INDIVIDUAL FIGURES ####
+##### DATA POINTS FOR SUPPLEMENTAL FIGURES #####
+
+## FvFm data
+FvFm.p <- ggplot(data= reg.s, aes(x= as.character(Day),
+                                  y= mean_FvFm,
+                                  ymax= mean_FvFm + se_FvFm,
+                                  ymin= mean_FvFm - se_FvFm,
+                                  group= Location))
+
+fvfm.fig <- FvFm.p +
+  plot_lines +
+  plot_errorbars +
+  plot_points +
+  scale_y_continuous(limits= c(0.12, 0.63), breaks= seq(0.1, 0.6, by= 0.1), labels= c("", "0.2", "", "0.4", "", "0.6")) +
+  x_axis_day +
+  scale_fill_manual(values= treatment.fill, name= treatment.legend) +
+  scale_shape_manual(values= treatment.shapes, name= treatment.legend) +
+  scale_linetype_manual(values= treatment.linetype, name= treatment.legend) +
+  labs(x= "Treatment", y= FvFm.rr.label) +
+  facet_rep_wrap(~facet_order, nrow= 1, labeller= label_parsed) +
+  theme_freshSci + 
+  theme_pam_param +
+  theme(axis.title.y = element_blank(),
+        axis.text.x = element_blank(),
+        legend.margin = margin(0.1, 0.1, 0.1, 0.1, unit= "cm"),
+        legend.key.width = unit(1, "cm"),
+        legend.box.spacing = unit(0, "cm"))
 
 
-## ETR max
-  ETRm.p <- ggplot(data= reg.s, aes(x= Day,
-                                    y= mean_ETRm,
-                                    ymax= mean_ETRm + se_ETRm,
-                                    ymin= mean_ETRm - se_ETRm,
-                                    group= Location))
+## Alpha data
+Alpha.p <- ggplot(data= reg.s, aes(x= as.character(Day),
+                                   y= mean_Alpha,
+                                   ymax= mean_Alpha + se_Alpha,
+                                   ymin= mean_Alpha - se_Alpha,
+                                   group= Location))
 
-  ## ETRm actual values
-  ETRm.p +
-    plot_lines +
-    plot_errorbars +
-    plot_points +
-    scale_y_continuous(limits= c(17, 80), breaks= seq(20, 80, by= 10), labels= c("20", "", "40", "", "60", "", "80")) +
-    scale_fill_manual(values= treatment.fill, labels= treatment.labels, name= treatment.legend) +
-    scale_shape_manual(values= treatment.shapes, labels= treatment.labels, name= treatment.legend) +
-    scale_linetype_manual(values= treatment.linetype, labels= treatment.labels, name= treatment.legend) +
-    labs(x= "", y= ETR.label) +
-    x_axis_day +
-    #facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
-    #facet_wrap(~facet_order, nrow= 1, labeller= labeller(facet_order= algae.facet.labels), scales= "free") +
-    facet_rep_wrap(~facet_order, nrow= 1, labeller= labeller(facet_order= algae.facet.labels)) +
-    theme_freshSci + 
-    theme_pam_param
-  #ggsave(last_plot(), filename = file.path(dir_out_fig, "ETRmREG2.pdf"), height= 8.4, width= 12.7, units= "cm", device = cairo_pdf)
-  ggsave(last_plot(), filename = file.path(dir_out_fig, "ETRmREG2_2.eps"), height= 17.8*0.66, width= 17.8, units= "cm")
-  
-  
+alpha.fig <- Alpha.p +
+  plot_lines +
+  plot_errorbars +
+  plot_points +
+  scale_y_continuous(limits= c(0.04, 0.167), breaks= seq(0.04, 0.16, by= 0.02), labels= c("0.04", "", "0.08", "", "0.12", "", "0.16")) +
+  x_axis_day +
+  scale_fill_manual(values= treatment.fill, labels= treatment.labels, name= treatment.legend) +
+  scale_shape_manual(values= treatment.shapes, labels= treatment.labels, name= treatment.legend) +
+  scale_linetype_manual(values= treatment.linetype, labels= treatment.labels, name= treatment.legend) +
+  labs(x= "Treatment", y= Alpha.rr.label) +
+  facet_rep_wrap(~facet_order, nrow= 1, labeller= label_parsed) +
+  theme_freshSci +
+  theme_pam_param +
+  theme(#strip.text = element_text(color= "transparent"),
+    strip.text = element_blank(),
+    axis.title.y = element_blank(),
+    axis.text.x = element_blank())
 
-  ## ETRm response ratio, data points
-  ETRm.rr.p.paired <- ggplot(data= reg.rr, aes(x= Location, y= ETRm.rr, group= pair))
+## ETRm response ratio
+ETRm.p <- ggplot(data= reg.s, aes(x= as.character(Day),
+                                  y= mean_ETRm,
+                                  ymax= mean_ETRm + se_ETRm,
+                                  ymin= mean_ETRm - se_ETRm,
+                                  group= Location))
 
-  ETRm.rr.p.paired +
-    yintercept +
-    geom_line(aes(color= pair)) +
-    geom_point(aes(color= pair), size= 3) +
-    scale_y_continuous(limits= c(-1, 0.55), breaks= seq(-1, 0.76, by= 0.25), labels= c("-1.0", "", "0.5", "", "0.0", "", "0.5", "")) +
-    scale_color_discrete(name= "Replicate pair") +
-    #scale_shape_manual(values= treatment.shapes) +
-    scale_linetype_manual(values= treatment.linetype, name= treatment.legend) +
-    labs(x= "Treatment", y= ETR.label) +
-    facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
-    theme_pam
-  ggsave(last_plot(), filename = file.path(dir_out_fig, "ETRmREG2_rr_paired.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
+ETRm.fig <- ETRm.p +
+  plot_lines +
+  plot_errorbars +
+  plot_points +
+  scale_y_continuous(limits= c(17, 80), breaks= seq(20, 80, by= 10), labels= c("20", "", "40", "", "60", "", "80")) +
+  x_axis_day +
+  scale_fill_manual(values= treatment.fill, labels= treatment.labels, name= treatment.legend) +
+  scale_shape_manual(values= treatment.shapes, labels= treatment.labels, name= treatment.legend) +
+  labs(x= "Treatment", y= ETR.rr.label) +
+  facet_rep_wrap(~facet_order, nrow= 1, labeller= label_parsed) +
+  theme_freshSci + 
+  theme_pam_param +
+  theme(#strip.text = element_text(color= "transparent"),
+    strip.text = element_blank(),
+    axis.title.y = element_blank())
 
-
-  ## ETRm response ratio day 1
-  ETRm.rr.d1.p <- ggplot(data= reg.treat.rr, aes(x= Algae,
-                                          y= ETRm.rr)) #,
-                                          #ymax= mean_ETRm.rr + se_ETRm.rr,
-                                          #ymin= mean_ETRm.rr - se_ETRm.rr))
-
-  ETRm.rr.d1.p +
-    yintercept +
-    geom_point() +
-   # plot_errorbars +
-    #plot_points
-    #cale_y_continuous(limits= c(-1, 0.55), breaks= seq(-1, 0.76, by= 0.25), labels= c("-1.0", "", "0.5", "", "0.0", "", "0.5", "")) +
-    scale_x_discrete(labels= NULL) +
-    labs(x= "Algae", y= "ETRmax response ratio", title= "Day 1 submerged & floating response ratio") +
-    facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels), scales= "free_x") +
-    theme_pam
-  ggsave(last_plot(), filename = file.path(dir_out_fig, "ETRmREG2_rr_d1_p1.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
-
-  ETRm.rr.d1.p2 <- ggplot(data= reg.treat.rr.s, aes(x= Algae,
-                                                   y= mean_ETRm.rr,
-                                                   ymax= mean_ETRm.rr + se_ETRm.rr,
-                                                   ymin= mean_ETRm.rr - se_ETRm.rr))
-  ETRm.rr.d1.p2 +
-    yintercept +
-    geom_point() +
-    plot_errorbars +
-    #plot_points
-    #scale_y_continuous(limits= c(-1, 0.55), breaks= seq(-1, 0.76, by= 0.25), labels= c("-1.0", "", "0.5", "", "0.0", "", "0.5", "")) +
-    scale_x_discrete(labels= NULL) +
-    labs(x= "Algae", y= "ETRmax response ratio (± se)", title= "Day 1 submerged & floating response ratio") +
-    facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels), scales= "free_x") +
-    theme_pam
-  ggsave(last_plot(), filename = file.path(dir_out_fig, "ETRmREG2_rr_d1_p2.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
+#### COMBINE FIGURES #####
+data_point.fig <- plot_grid(fvfm.fig + theme(legend.position="none"), 
+                    alpha.fig + theme(legend.position="none"), 
+                    ETRm.fig + theme(legend.position="none"), 
+                    ncol= 1, nrow= 3,
+                    axis= "l", align= "v") +
+  draw_label(label= expression(bold(paste("F"[v]~"/"~"F"[m]))), x= 0.008, y= 0.95, size= 10, hjust= 0) +
+  draw_label(label= expression(bold(paste("Alpha (\U03B1)"))), x= 0.008, y= 0.655, size= 10, hjust= 0) +
+  draw_label(label= expression(bold(paste("rETR"[max]))), x= 0.008, y= 0.325, size= 10, hjust= 0)
 
 
+data_point.fig.anno <-  annotate_figure(data_point.fig, 
+                                left = text_grob(label= "Value (± SE)", 
+                                                 rot = 90),
+                                
+                                bottom= text_grob(label= "Date (2014)", vjust= -0.5))
 
+legend <- get_legend(fvfm.fig + theme(legend.margin = margin(20, 0, 0, 48, unit= "points"),
+                                      legend.box.spacing = unit(0, "cm")))
+data_point.fig.anno.legend <- plot_grid(legend, data_point.fig.anno,
+          nrow=2,
+          rel_heights = c(0.02, 1))
 
+ggsave(rr.fig.anno, filename = file.path(data_point.fig.anno.legend, "Fig_S3.eps"), height= 17.8, width= 17.8, units= "cm", device= cairo_ps)
 
-## Alpha
-  Alpha.p <- ggplot(data= reg.s, aes(x= Day,
-                                     y= mean_Alpha,
-                                     ymax= mean_Alpha + se_Alpha,
-                                     ymin= mean_Alpha - se_Alpha,
-                                     group= Location))
-
-  Alpha.p +
-    plot_lines +
-    plot_errorbars +
-    plot_points +
-    scale_y_continuous(limits= c(0.04, 0.167), breaks= seq(0.04, 0.16, by= 0.02), labels= c("0.04", "", "0.08", "", "0.12", "", "0.16")) +
-    scale_fill_manual(values= treatment.fill, labels= treatment.labels, name= treatment.legend) +
-    scale_shape_manual(values= treatment.shapes, labels= treatment.labels, name= treatment.legend) +
-    scale_linetype_manual(values= treatment.linetype, labels= treatment.labels, name= treatment.legend) +
-    labs(x= "", y= Alpha.label) +
-    x_axis_day +
-   # facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
-    facet_rep_wrap(~facet_order, nrow= 1, labeller= labeller(facet_order= algae.facet.labels)) +
-    theme_freshSci + 
-    theme_pam_param
-  
-    #theme_pam
-  #ggsave(last_plot(), filename = file.path(dir_out_fig, "AlphaREG2.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
-  ggsave(last_plot(), filename = file.path(dir_out_fig, "AlphaREG2.eps"), height= 17.8*0.66, width= 17.8, units= "cm")
-  
-  
-  
-  ## Alpha response ratio, data points
-  Alpha.rr.p.paired <- ggplot(data= reg.rr, aes(x= Location, y= Alpha.rr, group= pair))
-
-  Alpha.rr.p.paired +
-    yintercept +
-    geom_line(aes(color= pair)) +
-    geom_point(aes(color= pair), size= 3) +
-    scale_y_continuous(limits= c(-1.5, 0.3), breaks= seq(-1.55, 0.25, by= 0.25), labels= c("-1.5", "",  "-1.0", "", "-0.5", "", "0.0", "")) +
-    scale_color_discrete(name= "Replicate pair") +
-    #scale_shape_manual(values= treatment.shapes) +
-    scale_linetype_manual(values= treatment.linetype) +
-    labs(x= "Treatment", y= "Alpha response ratio") +
-    facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
-    theme_pam
-  ggsave(last_plot(), filename = file.path(dir_out_fig, "AlphaREG2_rr_paired.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
-
-
-
-  Alpha.rr.d1.p2 <- ggplot(data= reg.treat.rr.s, aes(x= Algae,
-                                                     y= mean_Alpha.rr,
-                                                     ymax= mean_Alpha.rr + se_Alpha.rr,
-                                                     ymin= mean_Alpha.rr - se_Alpha.rr))
-
-  Alpha.rr.d1.p2 +
-    yintercept +
-    geom_point() +
-    plot_errorbars +
-    #plot_points
-    #scale_y_continuous(limits= c(-1, 0.55), breaks= seq(-1, 0.76, by= 0.25), labels= c("-1.0", "", "0.5", "", "0.0", "", "0.5", "")) +
-    scale_x_discrete(labels= NULL) +
-    labs(x= "Algae", y= "Alpha response ratio (± se)", title= "Day 1 submerged & floating response ratio") +
-    facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels), scales= "free_x") +
-    theme_pam
-  ggsave(last_plot(), filename = file.path(dir_out_fig, "AlphaREG2_rr_d1_p2.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
-
-
-
-  ## Fv/Fm
-  FvFm.p <- ggplot(data= reg.s, aes(x= Day,
-                                     y= mean_FvFm,
-                                     ymax= mean_FvFm + se_FvFm,
-                                     ymin= mean_FvFm - se_FvFm,
-                                     group= Location))
-
-  FvFm.p +
-    plot_lines +
-    plot_errorbars +
-    plot_points +
-    scale_y_continuous(limits= c(0.12, 0.63), breaks= seq(0.1, 0.6, by= 0.1), labels= c("", "0.2", "", "0.4", "", "0.6")) +
-    scale_fill_manual(values= treatment.fill, name= treatment.legend) +
-    scale_shape_manual(values= treatment.shapes, name= treatment.legend) +
-    scale_linetype_manual(values= treatment.linetype, name= treatment.legend) +
-    labs(x= "", y= FvFm.label) +
-    x_axis_day +
-    facet_rep_wrap(~facet_order, nrow= 1, labeller= labeller(facet_order= algae.facet.labels)) +
-    theme_freshSci + 
-    theme_pam_param
-  
-  
-  #ggsave(last_plot(), filename = file.path(dir_out_fig, "FvFm.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
-  ggsave(last_plot(), filename = file.path(dir_out_fig, "FvFm.eps"), height= 17.8*0.66, width= 17.8, units= "cm")
-  
-  
-  ## FvFm response ratio, data points
-  FvFm.rr.p.paired <- ggplot(data= reg.rr, aes(x= Location, y= FvFm.rr, group= pair))
-
-  FvFm.rr.p.paired +
-    yintercept +
-    geom_line(aes(color= pair)) +
-    geom_point(aes(color= pair), size= 3) +
-    scale_y_continuous(limits= c(-0.95, 0.3), breaks= seq(-0.8, 0.2, by= 0.2), labels= c("-0.8",  "", "0.04", "", "0.0", "")) +
-    scale_color_discrete(name= "Replicate pair") +
-    scale_linetype_manual(values= treatment.linetype, name= treatment.legend) +
-    labs(x= "Treatment", y= FvFm.rr.label) +
-    facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels)) +
-    theme_pam
-  ggsave(last_plot(), filename = file.path(dir_out_fig, "FvFm_rr_paired.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
-
-
-
-  FvFm.rr.d1.p2 <- ggplot(data= reg.treat.rr.s, aes(x= Algae,
-                                                    y= mean_FvFm.rr,
-                                                    ymax= mean_FvFm.rr + se_FvFm.rr,
-                                                    ymin= mean_FvFm.rr - se_FvFm.rr))
-
-  FvFm.rr.d1.p2 +
-    yintercept +
-    geom_point() +
-    plot_errorbars +
-    #plot_points
-    #scale_y_continuous(limits= c(-1, 0.55), breaks= seq(-1, 0.76, by= 0.25), labels= c("-1.0", "", "0.5", "", "0.0", "", "0.5", "")) +
-    scale_x_discrete(labels= NULL) +
-    labs(x= "Algae", y= FvFm.rr.label, title= "Day 1 submerged & floating response ratio") +
-    facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels), scales= "free_x") +
-    theme_pam
-  ggsave(last_plot(), filename = file.path(dir_out_fig, "FvFm_rr_d1_p2.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
-
-  
-
-  
