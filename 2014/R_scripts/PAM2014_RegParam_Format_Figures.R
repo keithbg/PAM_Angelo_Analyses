@@ -14,7 +14,7 @@ library(lemon) #facet_rep_wrap()
 library(ggpubr) #ggarrange()
 library(cowplot)
 library(extrafont) #https://github.com/wch/extrafont
-loadfonts(device= "postscript")
+#loadfonts(device= "postscript")
 ################################################################################
 
 #### FILE PATHS ################################################################
@@ -65,22 +65,6 @@ reg.s$facet_order <- factor(reg.s$facet_order,
                                       expression(italic("Nostoc")),
                                       expression(italic("Microcoleus")),
                                       expression(italic("Anabaena")~"Spires")))
-
-#### Import Fv/Fm, Fo ####
-lc.df <- read_tsv(file.path(dir_input, "PAM2014_clean_light_curve.tsv"))
-
-FvFM.Fo.df <- lc.df %>%
-  filter(Type == "FO", F0_Menupoint == "17") %>%
-  group_by(Day, Location, Algae, TreatID) %>%
-  summarise(
-    N = length(Fo),
-    mean_Fo = mean(Fo),
-    sd_Fo = sd(Fo),
-    se_Fo = sd_Fo / sqrt(N),
-    mean_FvFm = mean(FvFm),
-    sd_FvFm = sd(FvFm),
-    se_FvFm = sd_FvFm / sqrt(N)
-  )
 
 
 #### RESPONSE RATIOS ###########################################################
@@ -426,5 +410,5 @@ data_point.fig.anno.legend <- plot_grid(legend, data_point.fig.anno,
           nrow=2,
           rel_heights = c(0.02, 1))
 
-ggsave(rr.fig.anno, filename = file.path(data_point.fig.anno.legend, "Fig_S3.eps"), height= 17.8, width= 17.8, units= "cm", device= cairo_ps)
+ggsave(data_point.fig.anno.legend, filename = file.path(dir_out_fig_manuscript, "Fig_S3.eps"), height= 17.8, width= 17.8, units= "cm", device= cairo_ps)
 

@@ -13,12 +13,12 @@ library(cowplot)
 ################################################################################
 
 #### FILE PATHS ################################################################
-dir_input <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "PAM_data")
-dir_out_fig <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "Figures")
-dir_out_fig_manuscript <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "Manuscript_Drafts", "Manuscript_Figures")
+dir_input <- file.path("2014", "PAM_data")
+dir_out_fig <- file.path("2014", "Figures")
+dir_out_fig_manuscript <- file.path("..", "Manuscript_Drafts", "Manuscript_Figures")
 ################################################################################
 
-lc.df <- read_tsv(file.path(dir_input, "PAM2014_clean_light_curve2.tsv")) %>%
+lc.df <- read_tsv(file.path(dir_input, "PAM2014_clean_light_curve.tsv")) %>%
            mutate_at(vars(PAR:FvFm), funs(as.numeric(.))) %>% 
            mutate(Location= as.factor(ifelse(Location == "Benthic", "Submerged", "Floating")))
 lc.df$Location <- factor(lc.df$Location, levels= levels(lc.df$Location)[c(2, 1)])
@@ -62,7 +62,7 @@ day.facet.labels <- as_labeller(c(`0` = "23-Jul",
 
 ## ggplot themes
 # theme_freshSci
-source(file.path("/Users", "kbg", "Dropbox", "PAM_Angelo","PAM_Angelo_Analyses", "ggplot_themes.R"))
+source("ggplot_themes.R")
 
 # 
 # theme_pam <- theme(panel.grid = element_blank(),

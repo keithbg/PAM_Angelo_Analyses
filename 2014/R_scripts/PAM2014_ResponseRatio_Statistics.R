@@ -17,7 +17,7 @@ library(lsmeans)
 #### FILE PATHS ################################################################
 dir_input <- file.path("2014", "PAM_data")
 dir_out_table <- file.path("2014", "PAM_data")
-dir_out_fig_manuscript <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "Manuscript_Drafts", "Manuscript_Figures")
+dir_out_fig_manuscript <- file.path("..", "Manuscript_Drafts", "Manuscript_Figures")
 ################################################################################
 
 
@@ -75,8 +75,6 @@ fit.algae.alpha.rr <- lm(Alpha.rr ~ Treatment*Algae, data= rr.stats)
 summary(fit.algae.alpha.rr)
 anova(fit.algae.alpha.rr)
 
-
-
 fit.algae.ETRm.rr <- lm(ETRm.rr ~ Treatment*Algae, data= rr.stats)
 summary(fit.algae.ETRm.rr)
 anova(fit.algae.ETRm.rr)
@@ -85,8 +83,6 @@ anova(fit.algae.ETRm.rr)
 fit.algae.FvFm.rr <- lm(FvFm.rr ~ Treatment*Algae, data= rr.stats)
 summary(fit.algae.FvFm.rr)
 anova(fit.algae.FvFm.rr)
-
-
 
 
 # CALCULATED ON ACTUAL PARAMETER VALUES
@@ -158,32 +154,6 @@ clad.cyano.contrasts <- cbind(c(1, -2, -2, 1, 1, 1), # Cladophora vs. all cyanos
 
 colnames(clad.cyano.contrasts) <- c("Clad.v.Cyano", "Motile.v.NonMotile", "CladR.v.CladY", "Ana.v.Micro", "Nostoc.v.Riv")
 aov.contrast.names <- list(Algae=list("Clad.v.Cyano"=1, "Motile.v.NonMotile" = 2, "CladR.v.CladY"=3, "Ana.v.Micro"=4, "Nostoc.v.Riv"=5))
-
-# 
-# pc.stats %>% 
-#   group_by(Algae) %>% 
-#   summarize(mean(Alpha.rr))
-# 
-# mean(filter(pc.stats, Treatment == "Floating")$Alpha.rr)
-# 
-# out <- lm(Alpha.rr ~ Algae * Treatment, data= pc.stats)
-# summary(out)
-# summary.aov(out, split=list(Algae=list("Clad.v.Cyano"=1, "Motile.v.NonMotile" = 2, "CladR.v.CladY"=3, "Ana.v.Micro"=4, "Nostoc.v.Riv"=5))) 
-# 
-# 
-# 
-# sout <- summary(lm(Alpha.rr ~ Algae, data= pc.stats))
-# 
-# cfs <- coef(sout)[, 1]
-# 
-# cfs[1] + sum(cfs[-1]*clad.cyano.contrasts[6, ])
-# 
-# 
-# summary.aov(lm(Alpha.rr ~ Algae, data= pc.stats))
-# 
-# 
-# 
-# summary.aov(model1, split=list(animal=list("Canines vs. Felines"=1, "Cougars vs House Cats" = 2, "Wolves vs Dogs"=3))) 
 
 
 # Check to make sure product of columns sums to zero, which means that comparisons are orthogonal
@@ -305,13 +275,7 @@ for(param in c("Alpha.rr", "ETRm.rr", "FvFm.rr")){
 #t.test.output
 #arrange(t.test.output, p_value)
 #p.adjust(t.test.output$p_value, method= "fdr")
-write_tsv(t.test.output, path= file.path(dir_out_table, "t_test_output_2014.tsv"))
-
-## See effect of increasing degrees of freedom on p values, for the given t values
-# sum((1 - pt(abs(as.numeric(subset(t.test.output, test == "paired")$t_value)), df= 2))*2 < 0.05)
-# sum((1 - pt(abs(as.numeric(subset(t.test.output, test == "paired")$t_value)), df= 3))*2 < 0.05)
-# sum((1 - pt(abs(as.numeric(subset(t.test.output, test == "paired")$t_value)), df= 4))*2 < 0.05)
-# sum((1 - pt(abs(as.numeric(subset(t.test.output, test == "paired")$t_value)), df= 5))*2 < 0.05)
+#write_tsv(t.test.output, path= file.path(dir_out_table, "t_test_output_2014.tsv"))
 
 
 
@@ -413,10 +377,10 @@ power_curves_df <- bind_rows(power_curves) %>%
 
 
 # Plot curves
-source(file.path("/Users", "kbg", "Dropbox", "PAM_Angelo","PAM_Angelo_Analyses", "ggplot_themes.R"))
+source("ggplot_themes.R")
 library(ggsci)
 library(lemon) #facet_rep_wrap()
-dir_out_fig <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "Figures")
+dir_out_fig <- file.path("2014", "Figures")
 
 algae.facet.labels <- as_labeller(c(`6` = "Anabaena\nSpires",
                                     `4` = "Nostoc",
@@ -445,9 +409,3 @@ ggsave(last_plot(), filename = file.path(dir_out_fig_manuscript, "Fig_S3.eps"), 
 
 
 #write_tsv(effects, file.path(dir_out_fig, "power_analysis.txt"))
-# ggplot(power_curves_df, aes(x= rep, y= power)) +
-#   geom_line() +
-#   geom_point() +
-#   scale_x_continuous(breaks= seq(from=3, to= 10, by= 2)) +
-#   facet_wrap(~ algae_param, nrow= 3) +
-#   theme_classic()

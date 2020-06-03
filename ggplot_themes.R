@@ -1,4 +1,5 @@
 ### GGplot themes
+library(ggplot2)
 
 theme_freshSci <- theme(panel.grid = element_blank(),
                         plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm"),

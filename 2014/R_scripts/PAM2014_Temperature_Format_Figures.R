@@ -11,50 +11,27 @@ library(scales)
 ################################################################################
 
 #### FILE PATHS ################################################################
-dir_input <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "PAM_data", "raw_data", "iButton_data")
-dir_out_fig <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo","PAM_Angelo_Analyses", "2014", "Figures")
-dir_out_fig_manuscript <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "Manuscript_Drafts", "Manuscript_Figures")
-#dir_out_table <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "2014", "Data")
+dir_input <- file.path("2014", "PAM_data", "raw_data", "iButton_data")
+dir_out_fig <- file.path("2014", "Figures")
+dir_out_fig_manuscript <- file.path("..", "Manuscript_Drafts", "Manuscript_Figures")
 ################################################################################
 
 ## Source importing function
-source("/Users/kbg/R_Functions/ibutton_BatchImport_14Oct2015.R")
-theme_freshSci <- theme(panel.grid = element_blank(),
-                        plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm"),
-                        text = element_text(size= 10),
-                        plot.background = element_rect(fill = "transparent", color= "transparent"), # bg of the plot
-                        panel.background = element_rect(fill= "transparent", color= "transparent"),
-                        panel.border= element_rect(fill= NA, color= "black", linetype= "solid", size= 1),
-                        panel.ontop = TRUE,
-                        axis.text = element_text(colour="black"),
-                        axis.title.x = element_text(vjust = -0.75),
-                        axis.title.y = element_text(vjust = 1.5),
-                        #strip.background = element_rect(fill="transparent", color= "transparent"),
-                        strip.background = element_blank(),
-                        axis.text.x = element_text(angle= 45, hjust= 1),
-                        legend.background = element_rect(size=0.25, color=NULL, fill= "transparent"),
-                        legend.key = element_blank(),
-                        legend.position = "top",
-                        #legend.position = c(0, 0.5),
-                        legend.direction = "horizontal",
-                        legend.justification = "left",
-                        legend.box.margin = margin(0, 0, 0, 0, unit= "cm"),
-                        legend.box.spacing =  unit(0, "cm"))
-
+source("2014/R_scripts/ibutton_BatchImport_14Oct2015.R")
 
 ## Run import function
-  pam.ib <- ibutton.batch.import(dir_input) %>%
-    filter(DateTimeR >= "2014-07-24 06:00:00" & DateTimeR <= "2014-07-24 16:30:00") %>%
-    mutate(DateTimeRound= round_date(DateTimeR, "10 mins"), # round to every 10 minutes
-           Location= as.factor(ifelse((ID == "Rep1" | ID == "Rep3" | ID == "Rep5"), "Submerged", "Floating")),
-           Rep= ifelse(ID == "Rep1" | ID == "Rep2", "1",
-                       ifelse(ID == "Rep3" | ID == "Rep4", "2", "3")))
-  pam.ib$Location <- factor(pam.ib$Location, levels= levels(pam.ib$Location)[c(2, 1)])
-  
+pam.ib <- ibutton.batch.import(dir_input) %>% 
+  as_tibble() %>% 
+  filter(DateTimeR >= "2014-07-24 06:00:00" & DateTimeR <= "2014-07-24 16:30:00") %>%
+  mutate(ID= str_replace(ID, "^.*data/", "")) %>%
+  mutate(DateTimeRound= round_date(DateTimeR, "10 mins"), # round to every 10 minutes
+         Location= as.factor(ifelse((ID == "Rep1" | ID == "Rep3" | ID == "Rep5"), "Submerged", "Floating")),
+         Rep= ifelse(ID == "Rep1" | ID == "Rep2", "1",
+                     ifelse(ID == "Rep3" | ID == "Rep4", "2", "3")))
+pam.ib$Location <- factor(pam.ib$Location, levels= levels(pam.ib$Location)[c(2, 1)])
+
 
 ##### PLOTTING PARAMETERS ######################################################
-  
-  
   treatment.color <- c("DodgerBlue", "firebrick2")
   rep.color <- c("DodgerBlue", "limegreen", "purple4")
   treatment.linetype <- c("dashed", "solid")
@@ -62,28 +39,8 @@ theme_freshSci <- theme(panel.grid = element_blank(),
   x.axis.labels <- paste0(str_pad(6:17, width = 2, pad= "0"), ":00")
   x.axis.labels <- c("06:00", "", "08:00", "", "10:00", "", "12:00", "", "14:00", "", "16:00", "")
 
-
   ## ggplot themes
-  # theme_freshSci
-  source(file.path("/Users", "kbg", "Dropbox", "PAM_Angelo","PAM_Angelo_Analyses", "ggplot_themes.R"))
-  
-  theme_ibutton <- theme(panel.grid = element_blank(),
-                         plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm"),
-                         text = element_text(size= 14),
-                         plot.background = element_rect(fill = "transparent"), # bg of the plot
-                         panel.background = element_rect(fill= "transparent", color="black"),
-                         axis.text = element_text(colour="black"),
-                         axis.title.x = element_text(vjust = -0.75),
-                         axis.title.y = element_text(vjust = 1.5),
-                         legend.background = element_rect(size=0.25, color="black", fill= "transparent"),
-                         legend.key = element_blank(),
-                         strip.background=element_rect(fill="transparent", color="transparent"),
-                         legend.position = "top",
-                         axis.text.x = element_text(angle= 45, hjust= 1))
-
-
-
-
+  source("ggplot_themes.R") # theme_freshSci
 
 ##### Plot data #####
 
@@ -98,7 +55,7 @@ theme_freshSci <- theme(panel.grid = element_blank(),
     #scale_x_datetime(date_breaks = "1 hour", expand= c(0, 0)) +
     scale_color_manual(values= treatment.color, name= treatment.legend) +
     theme_ibutton
-  ggsave(last_plot(), filename = file.path(dir_out_fig, "PAM2014_temperature_plot.pdf"), height= 6.4, width= 8, units= "in")
+  #ggsave(last_plot(), filename = file.path(dir_out_fig, "PAM2014_temperature_plot.pdf"), height= 6.4, width= 8, units= "in")
 
   
   temp.2014 <- ggplot(data= pam.ib, aes(x= DateTimeRound, y= Value, group= ID))

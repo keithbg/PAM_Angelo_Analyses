@@ -12,22 +12,15 @@
 ################################################################################
 
 #### FILE PATHS ################################################################
-#dir_input <- file.path("/Users", "kbg", "Dropbox", "Keith_PAM_24Jul2014", "PAM_2014")
-#dir_output <- file.path("/Users", "kbg", "Dropbox", "Keith_PAM_24Jul2014", "PAM_2014", "R_formated_data")
-dir_input <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "PAM_data", "raw_data")
-dir_output <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "PAM_Angelo_Analyses", "2014", "PAM_data")
+dir_input <- file.path("2014", "PAM_data", "raw_data")
+dir_output <- file.path("2014", "PAM_data")
 ################################################################################
 
 
 #### Read in data from the two days of sampling
  d0 <- read_csv(file.path(dir_input, "Algae_Type_Day0_PI_KBG.csv"))
  d1 <- read_csv(file.path(dir_input, "Algae_Type_Day1_PI_KBG.csv"))
- # pi.df <- rbind(d0, d1)
- # pi.df <- pi.df[-which(pi.df$Algae == ""), ]
- # pi.df <- pi.df[, -which(names(pi.df) %in% c("Comments"))]
- # pi.df <- droplevels(pi.df)
- # str(pi.df)
-
+ 
 new.column.names <- c("Date", "Time", "Rep", "Treatment", "Location", "Algae", "Type", "F0_Menupoint", "Mem", "F", "Fm_p", "PAR", "Y.II", "ETR", "Fo_p", "ETRf", "qP", "qN", "qL", "NPQ", "Fo", "Fm", "FvFm")
 
 ## Format data
@@ -66,11 +59,11 @@ new.column.names <- c("Date", "Time", "Rep", "Treatment", "Location", "Algae", "
   pi.df %>%
     arrange(Date, Mem) %>%
     select(Date, Day, Time:Algae, TreatID, uniqueID, Day, everything()) %>%
-    write_tsv(path= file.path(dir_output, "PAM2014_clean_light_curve2.tsv"))
+    write_tsv(path= file.path(dir_output, "PAM2014_clean_light_curve.tsv"))
 
 
 ####  CALCULATE REGRESSION PARAMETERS (ALPHA, Ek, ETRmax)
-  source("/Users/kbg/R_Functions/PAM.regression.formulas.R") # Function written by Yvonne's colleague Katy (I think that is her name)
+  source("PAM.regression.formulas.R") # Function written by Yvonne's colleague Katy (I think that is her name)
 
   reg.params <- pi.df %>%
     filter(F0_Menupoint == "17") %>%
