@@ -4,11 +4,11 @@
 
 
 ## Source the R script that reformats data from the PAM .csv output files
-  source('/Users/kbg/R_Functions/PAM.data.read_Oct2015.R')
+source('2015/R_scripts/PAM.data.read_Oct2015.R')
 
 
 ##### Read in the data #####
-  dir_input <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "2015", "PAM_data", "PAM_data_raw")
+dir_input <- file.path("2015", "PAM_data", "PAM_data_raw")
 
 ## PAM data file to read in
   pathway <- file.path(dir_input, "Transplant_PAM_10Jun2015_edit.csv")
@@ -52,22 +52,3 @@
   lc10 <- merge(info,lc)
   rp10 <- merge(info,rp)
 
-
-##### Plot the Data #####
-
-## Plot Light Curve Data
-#
-#   lc.plot1 <- ggplot(data=lc10[which(lc10$Site == 3 & lc10$Algae == "Oed"),], aes(x=PAR, y=ETR, group = Mem))
-#
-#   lc.plot1 + geom_line(aes(color=Mem), size = 0.75) + geom_point(aes(color=Mem),size = 4) + labs(x=expression(paste("PAR ",mu,"Mols ",m^{-2}," ", s^{-1} )), y="ETR") + ggtitle("Rapid Light Curve") + theme_bw(base_size=20)
-#
-#   lc.plot1 + geom_line(aes(color=Algae), size = 0.75) + geom_point(aes(color=Algae),size = 4) + labs(x=expression(paste("PAR ",mu,"Mols ",m^{-2}," ", s^{-1} )), y="ETR") + facet_grid(Treatment ~ Site) + ggtitle("Rapid Light Curve") + theme_bw(base_size=20)
-#
-# ## Plot Fv/Fm
-#
-#   FvFm.plot<-ggplot(data=lc10, aes(x = Site, y = Fv.Fm, group = Mem))
-#
-#   FvFm.plot + geom_point(aes(color=Algae), size = 4) + geom_line(aes(color=Algae)) + labs(x = "Site", y = "Fv/Fm") + ylim(0,1) + facet_grid(Treatment~.) + ggtitle("Fv/Fm") + theme_bw(base_size=20)
-#
-#
-#

@@ -2,13 +2,12 @@
 ## Created by KBG Oct-2015
 
 
-
 ## Source the R script that reformats data from the PAM .csv output files
-  source('/Users/kbg/R_Functions/PAM.data.read_Oct2015.R')
+source('2015/R_scripts/PAM.data.read_Oct2015.R')
 
 
 ##### Read in the data #####
-  dir_input <- file.path("/Users", "kbg", "Dropbox", "PAM_Angelo", "2015", "PAM_data", "PAM_data_raw")
+dir_input <- file.path("2015", "PAM_data", "PAM_data_raw")
 ## PAM data file to read in
   pathway <- file.path(dir_input, "Transplant_PAM_15Jun2015_edit.csv")
 

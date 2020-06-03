@@ -4,7 +4,7 @@
 ## and removed after the last PAM measurement on the afternoon of June 15
 ## ibuttons recorded temperature in Celsius every 10 minutes
 
-## data in: /Users/kbg/Dropbox/PAM_Angelo/2015/PAM_data/ibutton_data
+## data in: 2015/PAM_data/ibutton_data
 
 #### Libraries #################################################################
 library(tidyverse)
@@ -15,14 +15,14 @@ library(lme4)
 library(lmerTest)
 library(lemon)
 library(ggpubr)
-source("/Users/kbg/R_Functions/ibutton_BatchImport_14Oct2015.R")
+source("ibutton_BatchImport_20151014.R")
 ################################################################################
 
 
 #### FILE PATHS ################################################################
 dir_input <- file.path("2015", "PAM_data")
 dir_out_fig <- file.path("2015", "Figures")
-dir_out_fig_manuscript <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "Manuscript_Drafts", "Manuscript_Figures")
+dir_out_fig_manuscript <- file.path("..", "Manuscript_Drafts", "Manuscript_Figures")
 dir_out_table <- file.path("2015", "PAM_data")
 ################################################################################
 
@@ -152,24 +152,7 @@ facet.by.site <- facet_grid(Site~., labeller = labeller(Site= site.facet.labels)
 
 ## ggplot themes
 # theme_freshSci
-source(file.path("/Users", "kbg", "Dropbox", "PAM_Angelo","PAM_Angelo_Analyses", "ggplot_themes.R"))
-
-
-# theme_ibutton <- theme(panel.grid = element_blank(),
-#                         plot.margin = unit(c(1, 1, 1, 1), "cm"),
-#                         text = element_text(size= 14),
-#                         plot.background = element_rect(fill = "transparent"), # bg of the plot
-#                         panel.background = element_rect(fill= "transparent", color="black"),
-#                         axis.text = element_text(colour="black"),
-#                         axis.title.x = element_text(vjust = -0.75),
-#                         axis.title.y = element_text(vjust = 1.5),
-#                         legend.background = element_rect(size=0.25, color="black", fill= "transparent"),
-#                         legend.key = element_blank(),
-#                         strip.background=element_rect(fill="transparent", color="transparent"),
-#                         legend.position = "top",
-#                         axis.text.x = element_text(angle= 45, hjust= 1))
-# 
-# 
+source("ggplot_themes.R")
 
 
 #### MAKE PLOTS ################################################################
@@ -195,7 +178,6 @@ temp.2015.fig <- temp.plot +
         axis.title.x = element_blank())
 temp.2015.fig
   
-#setwd("/Users/kbg/Dropbox/PAM_Angelo/PAM_Angelo_Analyses")
 #ggsave(last_plot(), filename = file.path(dir_out_fig, "temperature_plot_PAM2015.pdf"), height= 6.4, width= 8, units= "in")
 ggsave(last_plot(), filename = file.path(dir_out_fig, "temperature_plot_PAM2015.eps"), height= 12, width= 8.4, units= "cm", device= cairo_ps)
 

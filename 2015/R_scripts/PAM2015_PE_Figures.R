@@ -16,9 +16,9 @@ library(cowplot)
 
 
 #### FILE PATHS ################################################################
-dir_input <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "PAM_Angelo_Analyses", "2015", "PAM_data")
-dir_out_fig <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "PAM_Angelo_Analyses", "2015", "Figures")
-dir_out_fig_manuscript <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "Manuscript_Drafts", "Manuscript_Figures")
+dir_input <- file.path("2015", "PAM_data")
+dir_out_fig <- file.path("2015", "Figures")
+dir_out_fig_manuscript <- file.path("..", "Manuscript_Drafts", "Manuscript_Figures")
 ################################################################################
 
 #### READ IN AND FORMAT DATA ##############################################################
@@ -191,23 +191,8 @@ algae.facet.labels <- as_labeller(c(`Clad` = "Cladophora", `Oed` = "Oedogonium",
 
 ## ggplot themes
 # theme_freshSci
-source(file.path("/Users", "kbg", "Dropbox", "PAM_Angelo","PAM_Angelo_Analyses", "ggplot_themes.R"))
+source("ggplot_themes.R")
 
-# theme_pam <- theme(panel.grid = element_blank(),
-#                    plot.margin = unit(c(1, 1, 1, 1), "cm"),
-#                    text = element_text(size= 14),
-#                    plot.background = element_rect(fill = "transparent", color= "transparent"), # bg of the plot
-#                    panel.background = element_rect(fill= "transparent", color= "transparent"),
-#                    panel.border= element_rect(fill= NA, color= "black", linetype= "solid", size= 1),
-#                    panel.ontop = TRUE,
-#                    axis.text = element_text(colour="black"),
-#                    axis.title.x = element_text(vjust = -0.75),
-#                    axis.title.y = element_text(vjust = 1.5),
-#                    legend.background = element_rect(size=0.25, color="black", fill= "transparent"),
-#                    legend.key = element_blank(),
-#                    strip.background = element_rect(fill="transparent", color= "transparent"),
-#                    axis.text.x = element_text(angle= 45, hjust= 1),
-#                    legend.position = "top")
 
 
 #### MAKE PLOTS ################################################################

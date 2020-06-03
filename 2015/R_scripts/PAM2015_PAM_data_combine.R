@@ -2,10 +2,10 @@
 
 
 ## Read in the cleaned up data
-  source("/Users/kbg/Dropbox/PAM_Angelo/2015/R_scripts/PAM2015_transplant_09Jun_script.R")
-  source("/Users/kbg/Dropbox/PAM_Angelo/2015/R_scripts/PAM2015_transplant_10Jun_script.R")
-  source("/Users/kbg/Dropbox/PAM_Angelo/2015/R_scripts/PAM2015_transplant_11Jun_script.R")
-  source("/Users/kbg/Dropbox/PAM_Angelo/2015/R_scripts/PAM2015_transplant_15Jun_script.R")
+  source("2015/R_scripts/PAM2015_transplant_09Jun_script.R")
+  source("2015/R_scripts/PAM2015_transplant_10Jun_script.R")
+  source("2015/R_scripts/PAM2015_transplant_11Jun_script.R")
+  source("2015/R_scripts/PAM2015_transplant_15Jun_script.R")
 
 ## Drop the Mark column in lc10 and lc11
   lc10 <- subset(lc10, select=-c(Mark))
@@ -45,7 +45,7 @@
   #str(pdat)
 
 ## Write data frame as .csv
-  write.table(pdat, file="/Users/kbg/Dropbox/PAM_Angelo/2015/PAM_data/PAM2015_data_aggregated.tsv", row.names=FALSE, col.names= TRUE, quote= FALSE, sep= "\t")
+  write.table(pdat, file="2015/PAM_data/PAM2015_data_aggregated.tsv", row.names=FALSE, col.names= TRUE, quote= FALSE, sep= "\t")
 
 
 

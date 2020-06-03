@@ -10,30 +10,14 @@
 library(tidyverse)
 library(lubridate)
 library(ggplot2)
+source("ggplot_themes.R") #theme_freshSci
 ################################################################################
 
 
 #### FILE PATHS ################################################################
-dir_input <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "PAM_Angelo_Analyses", "2015", "PAM_data")
-dir_out_fig <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "PAM_Angelo_Analyses", "2015", "Figures_Keith_2015")
+dir_input <- file.path("2015", "PAM_data")
+dir_out_fig <- file.path("2015", "Figures")
 ################################################################################
-
-
-#### GGPLOT THEMES #############################################################
-theme_pam <- theme(panel.grid = element_blank(),
-                   plot.margin = unit(c(1, 1, 1, 1), "cm"),
-                   text = element_text(size= 14),
-                   plot.background = element_rect(fill = "transparent"), # bg of the plot
-                   panel.background = element_rect(fill= "transparent", color="black"),
-                   axis.text = element_text(colour="black"),
-                   axis.title.x = element_text(vjust = -0.75),
-                   axis.title.y = element_text(vjust = 1.5),
-                   legend.background = element_rect(size=0.25, color="black", fill= "transparent"),
-                   legend.key = element_blank(),
-                   strip.background=element_rect(fill="transparent", color="transparent"),
-                   axis.text.x = element_text(angle= 45, hjust= 1),
-                   legend.position = "top")
-
 
 
 #### FORMAT AND PLOT DATA ###################################################
@@ -75,7 +59,7 @@ dark.times.diff.plot <- dark.times %>%
   geom_hline(yintercept = 0, size= 1) +
   geom_boxplot() +
   ggtitle("Difference in dark incubation start times between days") +
-  theme_pam
+  theme_freshSci
 dark.times.diff.plot
 ggsave(dark.times.diff.plot, filename = file.path(dir_out_fig, "dark_incubation_start_diff.pdf"), height= 6.4, width= 8, units= "in")
 
@@ -92,7 +76,7 @@ taken.times.diff.plot <- taken.times %>%
   geom_hline(yintercept = 0, size= 1) +
   geom_boxplot() +
   ggtitle("Difference in measurement times between days") +
-  theme_pam
+  theme_freshSci
 taken.times.diff.plot
 ggsave(taken.times.diff.plot, filename = file.path(dir_out_fig, "measurement_time_diff.pdf"), height= 6.4, width= 8, units= "in")
 
@@ -111,7 +95,7 @@ deploy.times.diff.plot <- deploy.times %>%
   geom_hline(yintercept = 0, size= 1) +
   geom_boxplot() +
   ggtitle("Difference in re-deployment times between days") +
-  theme_pam
+  theme_freshSci
 deploy.times.diff.plot
 ggsave(deploy.times.diff.plot, filename = file.path(dir_out_fig, "redeployment_time_diff.pdf"), height= 6.4, width= 8, units= "in")
 

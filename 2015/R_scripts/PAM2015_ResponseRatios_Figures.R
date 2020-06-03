@@ -19,9 +19,9 @@ loadfonts(device= "postscript")
 
 
 #### FILE PATHS ################################################################
-dir_input <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "PAM_Angelo_Analyses", "2015", "PAM_data")
-dir_out_fig <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "PAM_Angelo_Analyses", "2015", "Figures")
-dir_out_fig_manuscript <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "Manuscript_Drafts", "Manuscript_Figures")
+dir_input <- file.path("2015", "PAM_data")
+dir_out_fig <- file.path("2015", "Figures")
+dir_out_fig_manuscript <- file.path("..", "Manuscript_Drafts", "Manuscript_Figures")
 
 ################################################################################
 
@@ -47,9 +47,6 @@ treatment.order <- c("Thal", "Marg")
 treatment.labels <- c("Thalweg", "Margin")
 treatment.fill <- c("white", "black")
 treatment.shapes <- c(21, 21)
-#algae.facet.labels <- as_labeller(c(`Clad` = expression(italic("Cladophora")), `Oed` = expression(italic("Oedogonium")), `Peri` = "Periphyton"))
-#algae.facet.labels <- as_labeller(c(`Clad` = "Cladophora", `Oed` = "Oedogonium", `Peri` = "Periphyton"))
-#facet.by.algae <- facet_grid(.~Algae, labeller= labeller(Algae= algae.facet.labels))
 facet.by.algae <- facet_rep_grid(.~Algae, labeller= label_parsed)
 
 
@@ -57,28 +54,8 @@ facet.by.algae <- facet_rep_grid(.~Algae, labeller= label_parsed)
 # theme_freshSci
 source("ggplot_themes.R")
 
-# theme_rr <- theme(panel.grid = element_blank(),
-#                    plot.margin = unit(c(1, 1, 1, 1), "cm"),
-#                    text = element_text(size= 14),
-#                   plot.background = element_rect(fill = "transparent", color= "transparent"), # bg of the plot
-#                   panel.background = element_rect(fill= "transparent", color= "transparent"),
-#                   panel.border= element_rect(fill= NA, color= "black", linetype= "solid", size= 1),
-#                   panel.ontop = TRUE,
-#                    axis.text = element_text(colour="black"),
-#                    axis.title.x = element_text(vjust = -0.75),
-#                    axis.title.y = element_text(vjust = 1.5),
-#                    legend.background = element_rect(size=0.25, color="black", fill= "transparent"),
-#                    legend.key = element_blank(),
-#                    strip.background=element_rect(fill="transparent", color="transparent"),
-#                    axis.text.x = element_text(angle= 45, hjust= 1),
-#                    legend.position = "top")
-
-
-
-
 
 #### MAKE PLOTS ################################################################
-################################################################################
 
 
 #### Fv/Fm #####################################################################
@@ -198,31 +175,3 @@ ggsave(rr.fig.2015.anno, filename = file.path(dir_out_fig, "PAM2015_ResponseRati
 
 
 
-
-
-
-
-
-
-
-
-#### Ek    #####################################################################
-
-p.Ek.reg2 <- ggplot(data= rr.figs, aes(x= Date,
-                                       y= mean.rr.Ek.REG2,
-                                       ymax= mean.rr.Ek.REG2 + se.rr.Ek.REG2,
-                                       ymin= mean.rr.Ek.REG2 - se.rr.Ek.REG2,
-                                       group= ID))
-
-p.Ek.reg2 +
-  yintercept +
-  plot_errorbars +
-  plot_points +
-  scale_y_continuous(limits= c(-0.12, 0.6), breaks= seq(-0.1, 0.6, by= 0.1), labels= c("", "0", "", "0.2", "",  "0.4", "", "0.6")) +
-  labs(x= "", y= bquote("Mean" ~ E[k] ~ "± se")) +
-  scale_fill_manual(values= treatment.fill) +
-  scale_shape_manual(values= treatment.shapes) +
-  x_axis_format +
-  facet.by.algae +
-  theme_rr
-ggsave(last_plot(), filename = file.path(dir_out_fig, "EkREG2_rr.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)

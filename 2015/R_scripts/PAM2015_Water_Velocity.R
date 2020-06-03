@@ -2,8 +2,6 @@
 ## Water velocity measured with a Pygmy flow meter
 ## Depth in centimeters; velocity in meters / second
 
-## data in: /Users/kbg/Dropbox/PAM_Angelo/2015/PAM_data
-
 
 #### Libraries #################################################################
 library(tidyverse)
@@ -14,8 +12,8 @@ library(lemon)
 
 
 #### FILE PATHS ################################################################
-dir_input <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "PAM_Angelo_Analyses", "2015", "PAM_data")
-dir_out_fig <- file.path("/Users","kbg","Dropbox","PAM_Angelo", "PAM_Angelo_Analyses", "2015", "Figures")
+dir_input <- file.path("2015", "PAM_data")
+dir_out_fig <- file.path("2015", "Figures")
 ################################################################################
 
 #### READ IN AND FORMAT DATA ##############################################################
@@ -29,7 +27,7 @@ vel.df <- read_tsv(file.path(dir_input, "PAM2105_water_velocity_data.tsv")) %>%
 
 ##### PLOTTING PARAMETERS ######################################################
 # theme_freshSci
-source(file.path("/Users", "kbg", "Dropbox", "PAM_Angelo","PAM_Angelo_Analyses", "ggplot_themes.R"))
+source("ggplot_themes.R")
 
 yintercept <- geom_hline(yintercept = 0, size= 0.25)
 treatment.order <- c("Thal", "Marg")
@@ -41,21 +39,9 @@ treatment.shapes <- c(21, 21)
 
 #### MAKE PLOTS ################################################################
 
-# vel.plot1 <- ggplot(data= vel.df, aes(x= Date, y= velocity_ms * 100, group= interaction(Treatment, Date)))
-# 
-# vel.plot1 +
-#   geom_boxplot(aes()) +
-#   geom_point(aes(fill= Treatment, shape= Treatment), position= position_dodge(width= 0.5)) +
-#   x_axis_format +
-#   scale_fill_manual(values= treatment.fill, breaks= treatment.order, labels= treatment.labels) +
-#   scale_shape_manual(values= treatment.shapes, breaks= treatment.order, labels= treatment.labels) +
-#   scale_color_manual(values= treatment.col) +
-#   theme_pam
+vel.plot <- ggplot(data= vel.df, aes(x= rev(Treatment), y= velocity_ms * 100))
 
-
-vel.plot2 <- ggplot(data= vel.df, aes(x= rev(Treatment), y= velocity_ms * 100))
-
-velocity.2015.fig <- vel.plot2 +
+velocity.2015.fig <- vel.plot +
   yintercept +
   geom_boxplot(aes(), outlier.color = "transparent") +
   geom_point(aes(fill= Treatment, shape= Treatment), position= position_jitter(width= 0.2), size= 1) +

@@ -17,7 +17,7 @@ dir_out_fig_manuscript <- file.path("..", "Manuscript_Drafts", "Manuscript_Figur
 ################################################################################
 
 ## Source importing function
-source("2014/R_scripts/ibutton_BatchImport_14Oct2015.R")
+source("ibutton_BatchImport_20151014.R")
 
 ## Run import function
 pam.ib <- ibutton.batch.import(dir_input) %>% 
