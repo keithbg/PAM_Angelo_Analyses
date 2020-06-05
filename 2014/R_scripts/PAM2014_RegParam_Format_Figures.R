@@ -364,7 +364,7 @@ alpha.fig <- Alpha.p +
     axis.title.y = element_blank(),
     axis.text.x = element_blank())
 
-## ETRm response ratio
+## ETRm 
 ETRm.p <- ggplot(data= reg.s, aes(x= as.character(Day),
                                   y= mean_ETRm,
                                   ymax= mean_ETRm + se_ETRm,

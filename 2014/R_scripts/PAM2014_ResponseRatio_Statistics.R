@@ -401,7 +401,7 @@ ggplot(power_curves_df, aes(x= rep, y= power)) +
   theme_freshSci
 
 ggsave(last_plot(), filename = file.path(dir_out_fig, "2014_power_analysis.pdf"), height= 17.8*0.66, width= 17.8, units= "cm", device= cairo_pdf)
-ggsave(last_plot(), filename = file.path(dir_out_fig_manuscript, "Fig_S3.eps"), height= 17.8*0.66, width= 17.8, units= "cm", device= cairo_ps)
+ggsave(last_plot(), filename = file.path(dir_out_fig_manuscript, "Fig_S4.eps"), height= 17.8*0.66, width= 17.8, units= "cm", device= cairo_ps)
 
 
 
