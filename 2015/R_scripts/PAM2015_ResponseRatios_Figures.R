@@ -34,6 +34,10 @@ rr.figs <- read_tsv(file.path(dir_input, "PAM2015_response_ratios_figures.tsv"))
 
 
 ##### PLOTTING PARAMETERS ######################################################
+## ggplot theme for response ratio plots
+source("ggplot_themes.R") # theme_freshSci
+
+
 plot_points <- geom_point(aes(fill= Treatment, shape= Treatment),
                           position= position_dodge(width= 0.6),
                           color= "black",
@@ -50,9 +54,6 @@ treatment.shapes <- c(21, 21)
 facet.by.algae <- facet_rep_grid(.~Algae, labeller= label_parsed)
 
 
-## ggplot theme for response ratio plots
-# theme_freshSci
-source("ggplot_themes.R")
 
 
 #### MAKE PLOTS ################################################################
@@ -174,4 +175,118 @@ ggsave(rr.fig.2015.anno, filename = file.path(dir_out_fig_manuscript, "Fig_8.eps
 ggsave(rr.fig.2015.anno, filename = file.path(dir_out_fig, "PAM2015_ResponseRatios_combined.eps"), height= 12.7, width= 17.8, units= "cm", device= cairo_ps)
 
 
+##### SUPPLEMENTARY FIGURE OF PARAMETER VALUES #####
+lc.reg.reps.param <- read_tsv(file.path(dir_input, "PAM2015_parameters_figures.tsv")) %>% 
+  mutate(Algae= factor(.$Algae, labels= c(expression(bolditalic("Cladophora")), 
+                                          expression(bolditalic("Oedogonium")), 
+                                          expression(bold("Epilithic diatoms")))))
+str(lc.reg.reps.param)
+
+levels(factor(lc.reg.reps.param$Algae))
+
+## Plotting variables
+plot_points_params <- geom_point(aes(fill= Treatment, shape= Treatment),
+                                position= position_dodge(width= 0.6),
+                                color= "black",
+                                size= 1.5)
+x_axis_format_params <- scale_x_date(breaks= seq.Date(as.Date("2015-06-09"), as.Date("2015-06-15"), by= 1),
+                                     labels=c("09-Jun", "10-Jun", "11-Jun", "", "", "", "15-Jun"))
+
+
+
+## Make plots
+fv.fm <- ggplot(data= lc.reg.reps.param, aes(x= Date,
+                                     y= mean.Fv.Fm,
+                                     ymax= mean.Fv.Fm + se.Fv.Fm,
+                                     ymin= mean.Fv.Fm - se.Fv.Fm,
+                                     group= ID))
+
+fvfm <- fv.fm +
+  yintercept +
+  plot_errorbars +
+  plot_points_params +
+  scale_y_continuous(limits= c(0.2, 0.65), expand= c(0, 0)) +
+  labs(x= "", y= bquote(F[v]/F[m] ~ " (± SE)")) +
+  scale_fill_manual(values= treatment.fill, breaks= treatment.order, labels= treatment.labels) +
+  scale_shape_manual(values= treatment.shapes, breaks= treatment.order, labels= treatment.labels) +
+  x_axis_format_params +
+  facet.by.algae +
+  # theme_rr +
+  theme_freshSci +
+  theme(
+    #axis.title.y = element_blank(),
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank(),
+    legend.position = "top",
+    legend.margin = margin(0, 0, 0, 0, unit= "cm"),
+    legend.box.spacing = unit(0, "cm"),
+    axis.line = element_line(size= 0.25))
+#fvfm
+
+
+### Alpha REG2
+p.alpha.reg2.param <- ggplot(data= lc.reg.reps.param, aes(x= Date,
+                                          y= mean.alpha.REG2,
+                                          ymax= mean.alpha.REG2 + se.alpha.REG2,
+                                          ymin= mean.alpha.REG2 - se.alpha.REG2,
+                                          group= ID))
+
+alpha <- p.alpha.reg2.param +
+  yintercept +
+  plot_errorbars +
+  plot_points_params +
+  scale_y_continuous(limits= c(0, 0.25), expand= c(0, 0)) +
+  labs(x= "", y= bquote("\U03B1 (± SE)")) +
+  scale_fill_manual(values= treatment.fill, breaks= treatment.order, labels= treatment.labels) +
+  scale_shape_manual(values= treatment.shapes, breaks= treatment.order, labels= treatment.labels) +
+  x_axis_format_params +
+  facet.by.algae +
+  theme_freshSci +
+  theme(strip.text = element_blank(),
+        #axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        legend.position = "none")
+#alpha
+
+
+#### ETR MAX REG 2 #############################################################
+
+p.ETRmax.reg2.param<- ggplot(data= lc.reg.reps.param, aes(x= Date,
+                                           y= mean.ETRm.REG2,
+                                           ymax= mean.ETRm.REG2 + se.ETRm.REG2,
+                                           ymin= mean.ETRm.REG2 - se.ETRm.REG2,
+                                           group= ID))
+
+etrm <- p.ETRmax.reg2.param +
+  yintercept +
+  plot_errorbars +
+  plot_points_params +
+  scale_y_continuous(limits= c(0, 175), expand= c(0, 0)) +
+  labs(x= "", y= bquote(rETR[max] ~ " (± SE)")) +
+  scale_fill_manual(values= treatment.fill, breaks= treatment.order, labels= treatment.labels) +
+  scale_shape_manual(values= treatment.shapes, breaks= treatment.order, labels= treatment.labels) +
+  x_axis_format_params +
+  facet.by.algae +
+  theme_freshSci +
+  theme(strip.text = element_blank(),
+        #axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        axis.text.x = element_text(angle= 45, hjust= 1, vjust= 1))
+#etrm
+
+
+#### COMBINED PLOT FOR MANUSCRIPT #####
+param.fig.2015 <- plot_grid(fvfm, 
+                         alpha + theme(legend.position="none"), 
+                         etrm + theme(legend.position= "none"), 
+                         rel_heights = c(1.3, 1, 1.2),
+                         ncol= 1, nrow= 3) +
+  draw_label(label= expression(bold(paste("F"[v]~"/"~"F"[m]))), x= 0.01, y= 0.89, size= 10, hjust= 0) +
+  draw_label(label= expression(bold("Alpha (\U03B1)")), x= 0.01, y= 0.63, size= 10, hjust= 0) +
+  draw_label(label= expression(bold(paste("rETR"[max]))), x= 0.01, y= 0.34, size= 10, hjust= 0)
+#param.fig.2015
+
+
+ggsave(param.fig.2015, filename = file.path(dir_out_fig_manuscript, "Fig_S5.eps"), height= 12.7, width= 17.8, units= "cm", device= cairo_ps)
 

@@ -132,6 +132,42 @@ lc.reg.reps <- lc.reg.pseu %>%
   ungroup() %>%
   mutate(ID= str_c(Algae, Treatment, sep= "."))
 
+#### PARAMETERS ###########################
+#### AVERAGE OVER PSEUDOREPLICATES
+lc.reg.pseu.param <- lc.reg %>%
+  filter(PAR == 1, Algae != "Blank") %>%
+  group_by(Date, Site, Algae, Treatment) %>%
+  summarize(n= length(REG2.alpha),
+            pseu.alpha.REG2 = mean(REG2.alpha, na.rm= TRUE),
+            pseu.sd.alpha.REG2 = sd(REG2.alpha, na.rm= TRUE),
+            pseu.ETRm.REG2= mean(REG2.ETRm, na.rm= TRUE),
+            pseu.sd.ETRm.REG2= sd(REG2.ETRm, na.rm= TRUE),
+            pseu.Fv.Fm = mean(Fv.Fm, na.rm= TRUE),
+            pseu.sd.Fv.Fm = sd(Fv.Fm, na.rm= TRUE)) %>%
+  ungroup() %>%
+  mutate(Day= yday(Date) - yday(unique(Date)[1]),
+         ID= str_c(Site, Algae, Treatment, sep= "."))
+
+
+
+lc.reg.reps.param <- lc.reg.pseu.param %>%
+  group_by(Date, Algae, Treatment) %>%
+  summarize(n= length(pseu.alpha.REG2),
+            mean.alpha.REG2 = mean(pseu.alpha.REG2, na.rm= TRUE),
+            sd.alpha.REG2 = sd(pseu.alpha.REG2, na.rm= TRUE),
+            se.alpha.REG2 = sd.alpha.REG2 / sqrt(n),
+            mean.ETRm.REG2= mean(pseu.ETRm.REG2, na.rm= TRUE),
+            sd.ETRm.REG2= sd(pseu.ETRm.REG2, na.rm= TRUE),
+            se.ETRm.REG2 = sd.ETRm.REG2 / sqrt(n),
+            mean.Fv.Fm= mean(pseu.Fv.Fm, na.rm= TRUE),
+            sd.Fv.Fm= sd(pseu.Fv.Fm, na.rm= TRUE),
+            se.Fv.Fm = sd.Fv.Fm / sqrt(n)) %>%
+  ungroup() %>%
+  mutate(ID= str_c(Algae, Treatment, sep= "."))
+
+
+
+
 #### MERGE AND EXPORT DATA FRAMES ##############################################
 ################################################################################
 
@@ -141,9 +177,11 @@ lc.reg.reps <- lc.reg.pseu %>%
 lc.reg %>%
   write_tsv(path= file.path(dir_out, "PAM2015_regression_parameters.tsv"))
 
+lc.reg.reps.param %>% 
+  write_tsv(path= file.path(dir_out, "PAM2015_parameters_figures.tsv"))
+
 lc.reg.reps %>%
 write_tsv(path= file.path(dir_out, "PAM2015_response_ratios_figures.tsv"))
-
 
 #left_join(lc.reg.rr, pdata.rr) %>%
 lc.reg.pseu %>%

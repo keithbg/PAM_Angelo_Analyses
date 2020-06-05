@@ -374,6 +374,13 @@ power_curves_df <- bind_rows(power_curves) %>%
                                                   ifelse(algae == "Nostoc", "4",
                                                          ifelse(algae == "Riv", "3", "7")))))))
 
+power_curves_df$facet_order <- factor(power_curves_df$facet_order, 
+                                      labels= c(expression(italic("Cladophora")~"Yellow"),
+                                                expression(italic("Cladophora")~"Red"),
+                                                expression(italic("Rivularia")),
+                                                expression(italic("Nostoc")),
+                                                expression(italic("Microcoleus")),
+                                                expression(italic("Anabaena")~"Spires")))
 
 
 # Plot curves
@@ -381,15 +388,6 @@ source("ggplot_themes.R")
 library(ggsci)
 library(lemon) #facet_rep_wrap()
 dir_out_fig <- file.path("2014", "Figures")
-
-algae.facet.labels <- as_labeller(c(`6` = "Anabaena\nSpires",
-                                    `4` = "Nostoc",
-                                    `5`= "Microcoleus",
-                                    `3` = "Rivularia",
-                                    `2` = "Cladophora\nRed",
-                                    `1` = "Cladophora\nYellow",
-                                    `7` = "Blank"))
-
 
 ggplot(power_curves_df, aes(x= rep, y= power)) +
   geom_line(aes(color= param)) +
@@ -399,8 +397,7 @@ ggplot(power_curves_df, aes(x= rep, y= power)) +
                      labels= c("3", "", "5", "", "7", "", "9", "")) +
   scale_y_continuous(limits= c(0, 1.05), expand= c(0, 0)) +
   scale_color_startrek(name= "Parameter", labels= c("Alpha", "rETRmax", "Fv/Fm")) +
-  facet_rep_wrap(~facet_order, nrow= 2, labeller= labeller(facet_order= algae.facet.labels)) +
-  #facet_rep_wrap(~algae, nrow= 2) +
+  facet_rep_wrap(~facet_order, nrow= 2, labeller= label_parsed) +
   theme_freshSci
 
 ggsave(last_plot(), filename = file.path(dir_out_fig, "2014_power_analysis.pdf"), height= 17.8*0.66, width= 17.8, units= "cm", device= cairo_pdf)
