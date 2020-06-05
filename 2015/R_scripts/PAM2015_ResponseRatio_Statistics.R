@@ -122,7 +122,6 @@ alga.summary.list <- alga.time.test()$summary.list
 alga.anova.list <- alga.time.test()$anova.list
 alga.anova.pvalues <- alga.time.test()$anova.pvalues
 
-
 names(alga.summary.list)
 alga.summary.list$Clad.ETRm
 alga.anova.list$Clad.FvFm
