@@ -216,7 +216,7 @@ fvfm.rr.fig <- FvFm.rr.p +
   yintercept +
   plot_errorbars +
   plot_points +
-  scale_y_continuous(limits= c(-0.9, 0.3), breaks= seq(-0.8, 0.2, by= 0.2), labels= c("-0.8",  "", "0.04", "", "0.0", "")) +
+  scale_y_continuous(limits= c(-0.9, 0.3), breaks= seq(-0.8, 0.2, by= 0.2), labels= c("-0.8",  "", "-0.4", "", "0.0", "")) +
   scale_fill_manual(values= treatment.fill, name= treatment.legend) +
   scale_shape_manual(values= treatment.shapes, name= treatment.legend) +
   scale_linetype_manual(values= treatment.linetype, name= treatment.legend) +
@@ -231,7 +231,7 @@ fvfm.rr.fig <- FvFm.rr.p +
 fvfm.rr.fig
 
 #ggsave(last_plot(), filename = file.path(dir_out_fig, "FvFm_rr.pdf"), height= 6.4, width= 8, units= "in", device = cairo_pdf)
-ggsave(last_plot(), filename = file.path(dir_out_fig, "FvFm_rr.eps"), height= 17.8*0.66, width= 17.8, units= "cm")
+ggsave(last_plot(), filename = file.path(dir_out_fig, "FvFm_rr.eps"), height= 17.8*0.66, width= 17.8, units= "cm", device= cairo_ps)
 
 
 ## Alpha Response ratio
