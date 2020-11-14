@@ -8,6 +8,7 @@ library(tidyverse)
 library(lubridate)
 library(ggplot2)
 library(scales)
+library(extrafont)
 ################################################################################
 
 #### FILE PATHS ################################################################
@@ -37,7 +38,7 @@ pam.ib$Location <- factor(pam.ib$Location, levels= levels(pam.ib$Location)[c(2, 
   treatment.linetype <- c("dashed", "solid")
   treatment.legend <- "Treatment"
   x.axis.labels <- paste0(str_pad(6:17, width = 2, pad= "0"), ":00")
-  x.axis.labels <- c("06:00", "", "08:00", "", "10:00", "", "12:00", "", "14:00", "", "16:00", "")
+  x.axis.labels <- c("0600", "", "0800", "", "1000", "", "1200", "", "1400", "", "1600", "")
 
   ## ggplot themes
   source("ggplot_themes.R") # theme_freshSci
@@ -49,7 +50,7 @@ pam.ib$Location <- factor(pam.ib$Location, levels= levels(pam.ib$Location)[c(2, 
   temp.2014 +
     geom_line(aes(color= Location), size= 0.75) +
     #geom_point(aes(color= Location), size= 1) +
-    labs(x="Hour of day (24-Jul-2014)", y=expression('Temperature ('*degree*C*')')) +
+    labs(x="Hour of day (24 July 2014)", y=expression('Temperature ('*degree*C*')')) +
     scale_y_continuous(limits= c(18, 28), breaks= seq(18, 28, by= 1), labels= c("18", "", "20", "", "22", "", "24", "", "26", "", "28"), expand= c(0.02, 0)) +
     scale_x_datetime(date_breaks = "1 hour", labels = x.axis.labels, expand= c(0, 0)) +
     #scale_x_datetime(date_breaks = "1 hour", expand= c(0, 0)) +
@@ -63,7 +64,7 @@ pam.ib$Location <- factor(pam.ib$Location, levels= levels(pam.ib$Location)[c(2, 
   temp.2014 +
     geom_line(aes(linetype= Location, color= Rep), size= 0.5) +
     #geom_point(aes(color= Location), size= 1) +
-    labs(x="Hour of day (24-Jul-2014)", y=expression('Temperature ('*degree*C*')')) +
+    labs(x="Hour of day (24 July 2014)", y=expression('Temperature ('*degree*C*')')) +
     scale_y_continuous(limits= c(18, 28), breaks= seq(18, 28, by= 1), labels= c("18", "", "20", "", "22", "", "24", "", "26", "", "28"), expand= c(0.02, 0)) +
     scale_x_datetime(date_breaks = "1 hour", labels = x.axis.labels, expand= c(0, 0)) +
     #scale_color_manual(values= c(treatment.color), name= "Treatment") +
@@ -82,8 +83,8 @@ pam.ib$Location <- factor(pam.ib$Location, levels= levels(pam.ib$Location)[c(2, 
           legend.box= "horizontal",
           axis.text.x = element_text(angle= 0, hjust= 0.5))
   #ggsave(last_plot(), filename = file.path(dir_out_fig, "PAM2014_temperature_plot_reps.pdf"), height= 6.4, width= 8, units= "in")
-  ggsave(last_plot(), filename = file.path(dir_out_fig, "PAM2014_temperature_plot_reps.eps"), height= 8.4, width= 8.4, units= "cm")
-  ggsave(last_plot(), filename = file.path(dir_out_fig_manuscript, "Fig_3.eps"), height= 8.4, width= 8.4, units= "cm")
+  ggsave(last_plot(), filename = file.path(dir_out_fig, "PAM2014_temperature_plot_reps.eps"), height= 8.4, width= 8.4, units= "cm", device= cairo_ps)
+  ggsave(last_plot(), filename = file.path(dir_out_fig_manuscript, "Fig_3.eps"), height= 8.4, width= 8.4, units= "cm", device= cairo_ps)
   
 
 

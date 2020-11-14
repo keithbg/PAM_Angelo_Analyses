@@ -72,6 +72,8 @@ pam.ib.stats <- pam.ib %>%
   rename(Date = DOY)
 #write_tsv(pam.ib.stats, path= file.path(dir_out_table, "PAM2015_temperature_daily_summary.tsv"))
 
+summary(filter(pam.ib.stats, Treatment == "Margin")$mean.t)
+summary(filter(pam.ib.stats, Treatment == "Thalweg")$mean.t)
 
 ## Calculate daily min, max, and mean between all 4 sites
 pam.ib.stats %>% 
@@ -108,6 +110,8 @@ pam.ib.stats %>%
 
 
 #### STATISTICS ################################################################
+
+
 
 ## Removed site 4 because its temperature behaved differently than the other 3 sites
 ## Site 4 had clearer patterns
@@ -164,9 +168,9 @@ temp.plot <- ggplot(data= pam.ib.s, aes(x= DateTimeRound,
 
 temp.2015.fig <- temp.plot +
   geom_ribbon(aes(fill= Treatment), alpha= 0.5) +
-  labs(x="", y=expression('Temperature ('*degree*C*')')) +
+  labs(x="Date", y=expression('Temperature ('*degree*C*')')) +
   scale_y_continuous(limits= c(15, 33), labels= c("15", "20", "25", "30", "")) +
-  scale_x_datetime(date_breaks = "1 day", labels = date_format("%d-%b"), expand= c(0, 0)) +
+  scale_x_datetime(date_breaks = "1 day", labels = date_format("%d %B"), expand= c(0, 0)) +
   scale_fill_manual(values= treatment.fill, breaks= treatment.order, labels= treatment.labels) +
   #facet.by.site +
   facet_rep_wrap(~Site, ncol= 1, labeller = labeller(Site= site.facet.labels)) +
@@ -174,8 +178,7 @@ temp.2015.fig <- temp.plot +
   theme(legend.position = "top",
         legend.box.margin = margin(0, 0, 0, 0, unit= "cm"),
         legend.box.spacing = unit(0, "cm"),
-        legend.key.size = unit(0.25, "cm"),
-        axis.title.x = element_blank())
+        legend.key.size = unit(0.25, "cm"))
 temp.2015.fig
   
 #ggsave(last_plot(), filename = file.path(dir_out_fig, "temperature_plot_PAM2015.pdf"), height= 6.4, width= 8, units= "in")
@@ -191,9 +194,9 @@ vel.temp.fig <- ggarrange(velocity.2015.fig, temp.2015.fig,
                     ncol = 1, nrow = 2,
                     heights= c((8.4/12*0.5), 1-(8.4/12*0.5)))
 ggsave(vel.temp.fig, filename = file.path(dir_out_fig, "vel_temp_PAM2015.png"), height= 20.4, width= 8.4, units= "cm")
-ggsave(vel.temp.fig, filename = file.path(dir_out_fig, "vel_temp_PAM2015.eps"), height= 20.4, width= 8.4, units= "cm", device= cairo_ps)
+ggsave(vel.temp.fig, filename = file.path(dir_out_fig, "vel_temp_PAM2015.eps"), family= "Arial", height= 20.4, width= 8.4, units= "cm", device= cairo_ps)
 
-ggsave(vel.temp.fig, filename = file.path(dir_out_fig_manuscript, "Fig_6.eps"), height= 20.4, width= 8.4, units= "cm", device= cairo_ps)
+ggsave(vel.temp.fig, filename = file.path(dir_out_fig_manuscript, "Fig_6.eps"), family= "Arial", height= 20.4, width= 8.4, units= "cm", device= cairo_ps)
 
 
 

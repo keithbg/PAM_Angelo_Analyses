@@ -8,6 +8,7 @@ library(tidyverse)
 library(lubridate)
 library(ggplot2)
 library(lemon)
+library(extrafont)
 ################################################################################
 
 
@@ -45,7 +46,8 @@ velocity.2015.fig <- vel.plot +
   yintercept +
   geom_boxplot(aes(), outlier.color = "transparent") +
   geom_point(aes(fill= Treatment, shape= Treatment), position= position_jitter(width= 0.2), size= 1) +
-  labs(x= "Treatment", y= expression(paste("Water velocity (cm ", s^-1, ")"))) +
+  #labs(x= "Treatment", y= expression(paste("Water velocity (cm ", s^-1, ")"))) +
+  labs(x= "Treatment", y= "Water velocity (cm/s)") +
   scale_fill_manual(values= treatment.fill, breaks= treatment.order, labels= treatment.labels, guide= FALSE) +
   scale_shape_manual(values= treatment.shapes, breaks= treatment.order, labels= treatment.labels, guide= FALSE) +
   scale_x_discrete(breaks= c("Thal", "Marg"), labels= c("Margin", "Thalweg")) +
@@ -54,7 +56,7 @@ velocity.2015.fig <- vel.plot +
 velocity.2015.fig
 
 #ggsave(velocity.2015.fig, filename = file.path(dir_out_fig, "water_velocity_plot.pdf"), height= 6.4, width= 8, units= "in", device= cairo_pdf)
-ggsave(velocity.2015.fig, filename = file.path(dir_out_fig, "water_velocity_plot.eps"), height= 8.4, width= 8.4, units= "cm")
+ggsave(velocity.2015.fig, filename = file.path(dir_out_fig, "water_velocity_plot.eps"), family= "Arial", height= 8.4, width= 8.4, units= "cm", device= cairo_ps)
 
 
 

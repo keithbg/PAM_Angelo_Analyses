@@ -10,6 +10,8 @@ library(tidyverse)
 library(ggplot2)
 library(lemon)
 library(cowplot)
+library(extrafont)
+#loadfonts(device= "postscript")
 ################################################################################
 
 #### FILE PATHS ################################################################
@@ -57,8 +59,8 @@ treatment.shapes <- c(21, 21)
 treatment.legend <- "Treatment"
 ETR.label <- paste("rETRmax (± se)")
 
-day.facet.labels <- as_labeller(c(`0` = "23-Jul",
-                                    `1` = "24-Jul"))
+day.facet.labels <- as_labeller(c(`0` = "23 July 2014",
+                                    `1` = "24 July 2014"))
 
 ## ggplot themes
 # theme_freshSci
@@ -82,7 +84,8 @@ lc.fig <- lc.p +
   scale_fill_manual(values= treatment.fill, name= treatment.legend) +
   scale_shape_manual(values= treatment.shapes, name= treatment.legend) +
   scale_linetype_manual(values= treatment.linetype, name= treatment.legend) +
-  labs(x=expression(paste("PAR (",mu,"Mols ",m^{-2}," ", s^{-1}, ")")), y= "Relative electron transfer rate (rETR ± SE)") +
+  #labs(x=expression(paste("PAR (",mu,"Mols ",m^{-2}," ", s^{-1}, ")")), y= "Relative electron transfer rate (rETR ± SE)") +
+  labs(x=expression(paste("Photosynthetic active radiation (",mu,"mol ",m^{2},"/s)")), y= "Relative electron transfer rate (rETR ± SE)") +
   #facet_rep_grid(Algae~Day, labeller= labeller(Algae= algae.facet.labels, Day= day.facet.labels)) +
   facet_rep_grid(facet_order~Day, labeller= labeller(Day= day.facet.labels)) +
   theme_freshSci +
@@ -93,7 +96,7 @@ lc.fig <- lc.p +
         legend.key.width = unit(1, "cm"),
         legend.box.spacing = unit(0, "cm"),
         axis.line = element_line(size= 0.25))
-#lc.fig
+lc.fig
 
 lc.fig.anno <- plot_grid(lc.fig, ncol= 1) +
   draw_label(label= expression(paste(italic("Cladophora")," Yellow")), 
@@ -111,7 +114,7 @@ lc.fig.anno <- plot_grid(lc.fig, ncol= 1) +
 lc.fig.anno
 
 ggsave(lc.fig.anno, filename = file.path(dir_out_fig, "PAM2014_LightCurves.eps"), height= 12.7, width= 12.7, units= "cm")
-ggsave(lc.fig.anno, filename = file.path(dir_out_fig_manuscript, "Fig_4.eps"), height= 12.7, width= 12.7, units= "cm")
+ggsave(lc.fig.anno, filename = file.path(dir_out_fig_manuscript, "Fig_4.eps"), family= "Arial", height= 12.7, width= 12.7, units= "cm", device= cairo_ps)
 
 #ggsave(last_plot(), filename = file.path(dir_out_fig, "PAM2014_LightCurves.pdf"), height= 8, width= 6.4, units= "in", device = cairo_pdf)
 

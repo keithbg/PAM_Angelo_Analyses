@@ -11,7 +11,6 @@
 
 #### LIBRARIES #################################################################
 library(tidyverse)
-library(lsmeans)
 ################################################################################
 
 #### FILE PATHS ################################################################
@@ -57,7 +56,18 @@ dir_out_fig_manuscript <- file.path("..", "Manuscript_Drafts", "Manuscript_Figur
                               func_group= ifelse(Algae == "Clad_R" | Algae == "Clad_Y", "Chlorophyte",
                                                  ifelse(Algae == "Cyano_Spires" | Algae == "Phorm", "Cyano_motile", "Cyano_nonmotile")))
   func.group.stats$Treatment <- factor(func.group.stats$Treatment, levels= levels(func.group.stats$Treatment)[c(2, 1)])
+
+  #### TESTS FOR PARAMETRIC MODEL ASSUMPTIONS ####################################
+  ## Normality with Shapiro-Wilk test
+  shapiro.test(rr.stats$Alpha.rr)
+  shapiro.test(rr.stats$ETRm.rr)
+  shapiro.test(rr.stats$FvFm.rr)
   
+  ## Equality of variance with Levene test
+  car::leveneTest(Alpha.rr ~ Treatment*Algae, data= rr.stats)
+  car::leveneTest(ETRm.rr ~ Treatment*Algae, data= rr.stats)
+  car::leveneTest(FvFm.rr ~ Treatment*Algae, data= rr.stats)
+    
 #### STATISTICAL MODEL #########################################################
 # Treatment = fixed effect = p = 2 (Benthic and Floating)
 # Algae = fixed effect = Algae = j = 3 (Clad_Y, Clad_R, Anabaena Spires, Nostoc, Rivularia, Microcoleus)

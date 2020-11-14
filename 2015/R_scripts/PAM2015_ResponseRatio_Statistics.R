@@ -23,6 +23,19 @@ rr.stats <- read_tsv(file.path(dir_input, "PAM2015_response_ratios_stats.tsv")) 
              filter(Date != "2015-06-09") # remove first day because all ratios are zero
 ################################################################################
 
+#### TESTS FOR PARAMETRIC MODEL ASSUMPTIONS ####################################
+## Normality with Shapiro-Wilk test
+shapiro.test(rr.stats$pseu.alpha.REG2)
+shapiro.test(rr.stats$pseu.ETRm.REG2)
+hist(rr.stats$pseu.ETRm.REG2)
+shapiro.test(rr.stats$pseu.Fv.Fm)
+
+## Equality of variance with Levene test
+car::leveneTest(pseu.alpha.REG2 ~ Treatment*Algae, data= rr.stats)
+car::leveneTest(pseu.ETRm.REG2 ~ Treatment*Algae, data= rr.stats)
+car::leveneTest(pseu.Fv.Fm ~ Treatment*Algae, data= rr.stats)
+
+
 #### STATISTICAL MODEL #########################################################
 # Treatment = fixed effect = p = 2 (Thalweg and margin)
 # Algae = fixed effect = Algae = j = 3 (Cladophora, Oedogoneum, Periphyton)
@@ -49,13 +62,13 @@ anova(fit.algae.ETRm)
 
 fit.algae.FvFm <- lmer(pseu.Fv.Fm ~ Treatment*Algae + (1|Site), data= rr.stats)
 summary(fit.algae.FvFm)
-anova(fit.algae.FvFm)
+p.adjust(anova(fit.algae.FvFm)[ ,"Pr(>F)"][1],n=3)
 
 
-corrected.algae.pvalues <- as.data.frame(matrix(c(anova(fit.algae.alpha)[ ,"Pr(>F)"], anova(fit.algae.ETRm)[ ,"Pr(>F)"], anova(fit.algae.FvFm)[ ,"Pr(>F)"]),
-                            nrow= 3,
-                            dimnames= list(c("Treatment", "Algae", "Treatment:Algae"), c("Alpha", "ETRm", "FvFm"))))
-corrected.algae.pvalues <- sapply(corrected.algae.pvalues, function(x) p.adjust(x, method= "bonferroni"))
+# corrected.algae.pvalues <- as.data.frame(matrix(c(anova(fit.algae.alpha)[ ,"Pr(>F)"], anova(fit.algae.ETRm)[ ,"Pr(>F)"], anova(fit.algae.FvFm)[ ,"Pr(>F)"]),
+#                             nrow= 3,
+#                             dimnames= list(c("Treatment", "Algae", "Treatment:Algae"), c("Alpha", "ETRm", "FvFm"))))
+# corrected.algae.pvalues <- sapply(corrected.algae.pvalues, function(x) p.adjust(x, method= "fdr"))
 
 alga.stats <- rr.stats %>%
   filter(Algae == "Clad") %>%
@@ -121,6 +134,9 @@ return(list(summary.list= summary.list, anova.list= anova.list, anova.pvalues= a
 alga.summary.list <- alga.time.test()$summary.list
 alga.anova.list <- alga.time.test()$anova.list
 alga.anova.pvalues <- alga.time.test()$anova.pvalues
+
+
+sapply(alga.anova.pvalues[, -1], function(x) p.adjust(x, method= "fdr"))
 
 names(alga.summary.list)
 alga.summary.list$Clad.ETRm
