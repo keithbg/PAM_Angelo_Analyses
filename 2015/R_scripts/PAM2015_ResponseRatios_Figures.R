@@ -45,7 +45,7 @@ plot_points <- geom_point(aes(fill= Treatment, shape= Treatment),
 plot_errorbars <- geom_errorbar(position= position_dodge(width= 0.6), width= 0.3)
 yintercept <- geom_hline(yintercept = 0, size= 0.25)
 x_axis_format <- scale_x_date(breaks= seq.Date(as.Date("2015-06-10"), as.Date("2015-06-15"), by= 1),
-                              labels=c("10-Jun", "11-Jun", "", "", "", "15-Jun"))
+                              labels=c("10 June", "11 June", "", "", "", "15 June"))
 
 treatment.order <- c("Thal", "Marg")
 treatment.labels <- c("Thalweg", "Margin")
@@ -190,7 +190,7 @@ plot_points_params <- geom_point(aes(fill= Treatment, shape= Treatment),
                                 color= "black",
                                 size= 1.5)
 x_axis_format_params <- scale_x_date(breaks= seq.Date(as.Date("2015-06-09"), as.Date("2015-06-15"), by= 1),
-                                     labels=c("09-Jun", "10-Jun", "11-Jun", "", "", "", "15-Jun"))
+                                     labels=c("09 June", "10 June", "11 June", "", "", "", "15 June"))
 
 
 

@@ -179,7 +179,7 @@ plot_errorbars <- geom_errorbar(position= position_dodge(width= 0.4), width= 0.4
 plot_lines <- geom_line(aes(group= ID, linetype= Treatment), position= position_dodge(width= 0.4), size= 0.5)
 yintercept <- geom_hline(yintercept = 0, size= 0.25)
 x_axis_format <- scale_x_date(breaks= seq.Date(as.Date("2015-06-09"), as.Date("2015-06-15"), by= 1),
-                              labels=c("Jun-09", "Jun-10", "Jun-11", "", "", "", "Jun-15"))
+                              labels=c("June 09", "June 10", "June 11", "", "", "", "Jun 15"))
 treatment.order <- c("Thal", "Marg")
 treatment.labels <- c("Thalweg", "Margin")
 treatment.fill <- c("white", "black")
