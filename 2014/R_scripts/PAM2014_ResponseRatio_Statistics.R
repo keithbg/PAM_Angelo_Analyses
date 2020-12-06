@@ -301,7 +301,7 @@ t.test.func.group.output <- data.frame(parameter= as.character(NA),
 
 ## Loop over each functional type and parameter, save t and p values in the data frame
 count <- 1
-param= "Alpha.rr"
+#param= "Alpha.rr"
 for(param in c("Alpha.rr", "ETRm.rr", "FvFm.rr")){
   for(group in unique(func.group.stats$func_group)){
     output.paired <- func.group.stats %>%
@@ -410,9 +410,4 @@ ggplot(power_curves_df, aes(x= rep, y= power)) +
   facet_rep_wrap(~facet_order, nrow= 2, labeller= label_parsed) +
   theme_freshSci
 
-ggsave(last_plot(), filename = file.path(dir_out_fig, "2014_power_analysis.pdf"), height= 17.8*0.66, width= 17.8, units= "cm", device= cairo_pdf)
-ggsave(last_plot(), filename = file.path(dir_out_fig_manuscript, "Fig_S4.eps"), height= 17.8*0.66, width= 17.8, units= "cm", device= cairo_ps)
-
-
-
-#write_tsv(effects, file.path(dir_out_fig, "power_analysis.txt"))
+#ggsave(last_plot(), filename = file.path(dir_out_fig, "2014_power_analysis.pdf"), height= 17.8*0.66, width= 17.8, units= "cm", device= cairo_pdf)
