@@ -1,4 +1,4 @@
-### GGplot themes
+### GGplot themes for figures
 library(ggplot2)
 
 theme_freshSci <- theme(panel.grid = element_blank(),
